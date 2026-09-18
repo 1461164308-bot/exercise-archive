@@ -42,6 +42,24 @@ def safe_name(text: str, fallback: str = "未命名", limit: int = 60) -> str:
 STATUS_CN = {"wrong": "错题", "correct": "正确题", "blank": "未做题", "unknown": "未判定"}
 
 
+def _first_knowledge(q: Dict) -> str:
+    """取这道题的**第一个**知识点，供 ``{knowledge}`` 目录模板使用。
+
+    一道题通常有多个知识点（如"复数、单位根、复数的几何表示"），目录只能取一个 ——
+    取识别时排在第一位（也就是最核心的那个），其余知识点仍完整写在文字稿与报告里。
+    """
+    kps = q.get("knowledge_points") or []
+    if isinstance(kps, str):
+        kps = [kps]
+    for k in kps:
+        if isinstance(k, dict):
+            k = k.get("name") or k.get("知识点") or ""
+        name = str(k).strip()
+        if name:
+            return name
+    return "未标知识点"
+
+
 class Archiver:
     """归档器：负责目录规划、文件写入与索引维护。"""
 
@@ -78,6 +96,7 @@ class Archiver:
             "grade": safe_name(q.get("grade") or "未分学段"),
             "qtype": safe_name(q.get("qtype") or q.get("type") or "其他"),
             "status": STATUS_CN.get(str(q.get("status")), "未判定"),
+            "knowledge": safe_name(_first_knowledge(q)),
             "year": str(q.get("created_at", ""))[:4] or "未标年份",
             "month": str(q.get("created_at", ""))[5:7] or "00",
             "source": safe_name(q.get("source") or "未标来源"),

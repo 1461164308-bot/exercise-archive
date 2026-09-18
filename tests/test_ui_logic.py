@@ -214,6 +214,42 @@ class PickerAndArchiveTest(unittest.TestCase):
         finally:
             cleanup(tmp)
 
+    def test_12_folder_by_knowledge_point(self):
+        """``{knowledge}`` 目录变量：按知识点分类归档（如"复数"一个目录）。
+
+        一道题可以有多个知识点，目录只取第一个（最核心的那个）；
+        取不到时退回「未标知识点」，且知识点名里的非法字符要被替换掉。
+        """
+        from exerarchive import config
+
+        tmp = scratch("archive_knowledge")
+        try:
+            cfg = config.Config({})
+            cfg.set("archive.root", tmp)
+            cfg.set("archive.pattern", "{subject}/{knowledge}/{status}")
+            arch = Archiver(cfg, None)
+
+            q = {"uid": "Q1", "subject": "数学", "status": "wrong",
+                 "knowledge_points": ["复数", "单位根", "复数的几何表示"]}
+            folder = arch.folder_for(q)
+            self.assertIn("复数", folder)
+            self.assertNotIn("单位根", folder, "目录只取第一个知识点")
+            self.assertNotIn("复数的几何表示", folder)
+
+            # 没有知识点 → 落到「未标知识点」，不能崩
+            empty = arch.folder_for({"uid": "Q2", "subject": "数学", "status": "wrong"})
+            self.assertIn("未标知识点", empty)
+            # 知识点是 dict 形式（报告里那种 {name, textbook, note}）也能取名字
+            as_dict = arch.folder_for({"uid": "Q3", "subject": "数学", "status": "wrong",
+                                       "knowledge_points": [{"name": "导数"}]})
+            self.assertIn("导数", as_dict)
+            # 非法字符要被 safe_name 换掉
+            dirty = arch.folder_for({"uid": "Q4", "subject": "数学", "status": "wrong",
+                                     "knowledge_points": ["函数/极限:基础"]})
+            self.assertIn("函数_极限_基础", dirty)
+        finally:
+            cleanup(tmp)
+
 
 class ExportBlocksTest(unittest.TestCase):
     def test_20_blocks_cover_all_sections(self):

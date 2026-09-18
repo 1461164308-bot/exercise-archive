@@ -38,6 +38,9 @@ from .widgets import (COLORS, ChartCanvas, ImageCanvas, RichText, StatCard, Stat
 
 log = logging_setup.get_logger("ui.app")
 
+# 题库页「知识点」筛选下拉框里的“全部”选项（它对应的真实筛选值是空字符串）
+KP_ALL = "全部知识点"
+
 
 def pick_recognition_source(item: Dict) -> tuple:
     """决定这张图识别时用哪个文件、要不要跳过自动预处理。
@@ -193,6 +196,7 @@ class MainWindow(tk.Tk):
         parent.add(frame, weight=1)
         nb = ttk.Notebook(frame)
         nb.pack(fill="both", expand=True)
+        self.left_nb = nb          # 供冒烟测试/脚本切页（题库页的截图要用它）
 
         # 待处理
         tab = ttk.Frame(nb, padding=6)
@@ -214,27 +218,35 @@ class MainWindow(tk.Tk):
         ttk.Button(row, text="云端重识别", command=lambda: self.recognize_selected(force="cloud")).pack(
             side="left")
 
-        # 题目列表（可按状态/学科过滤）
+        # 题目列表（可按状态/学科/知识点过滤）
         tab2 = ttk.Frame(nb, padding=6)
         nb.add(tab2, text="题库")
         filt = ttk.Frame(tab2)
         filt.pack(fill="x", pady=(0, 4))
         self.filter_status = tk.StringVar(value="")
         self.filter_subject = tk.StringVar(value="")
+        self.filter_knowledge = tk.StringVar(value=KP_ALL)
+        self._kp_map: Dict[str, str] = {KP_ALL: ""}     # 下拉显示（"复数（3）"）→ 真正的知识点名
         ttk.Label(filt, text="状态").pack(side="left")
-        cb = ttk.Combobox(filt, textvariable=self.filter_status, width=8, state="readonly",
+        cb = ttk.Combobox(filt, textvariable=self.filter_status, width=7, state="readonly",
                           values=["", "wrong", "correct", "blank"])
-        cb.pack(side="left", padx=(2, 8))
+        cb.pack(side="left", padx=(2, 6))
         cb.bind("<<ComboboxSelected>>", lambda e: self.refresh_questions())
         ttk.Label(filt, text="学科").pack(side="left")
-        self.subject_combo = ttk.Combobox(filt, textvariable=self.filter_subject, width=8, state="readonly",
+        self.subject_combo = ttk.Combobox(filt, textvariable=self.filter_subject, width=6, state="readonly",
                                           values=[""] + prompts.SUBJECTS)
-        self.subject_combo.pack(side="left", padx=2)
+        self.subject_combo.pack(side="left", padx=(2, 6))
         self.subject_combo.bind("<<ComboboxSelected>>", lambda e: self.refresh_questions())
-        cols = ("uid", "subject", "qtype", "status", "stem")
+        # 知识点筛选：识别时模型给出的知识点（如"复数"）会作为分类维度出现在这里
+        ttk.Label(filt, text="知识点").pack(side="left")
+        self.kp_combo = ttk.Combobox(filt, textvariable=self.filter_knowledge, width=12,
+                                     state="readonly", values=[KP_ALL])
+        self.kp_combo.pack(side="left", padx=2)
+        self.kp_combo.bind("<<ComboboxSelected>>", lambda e: self.refresh_questions())
+        cols = ("uid", "subject", "kp", "qtype", "status", "stem")
         self.q_tree = ttk.Treeview(tab2, columns=cols, show="headings", selectmode="extended")
-        for c, t, w in (("uid", "题号", 110), ("subject", "学科", 60), ("qtype", "题型", 70),
-                        ("status", "状态", 60), ("stem", "题干", 260)):
+        for c, t, w in (("uid", "题号", 92), ("subject", "学科", 44), ("kp", "知识点", 116),
+                        ("qtype", "题型", 52), ("status", "状态", 46), ("stem", "题干", 130)):
             self.q_tree.heading(c, text=t)
             self.q_tree.column(c, width=w, anchor="w")
         self.q_tree.pack(fill="both", expand=True)
@@ -856,16 +868,44 @@ class MainWindow(tk.Tk):
     def refresh_questions(self) -> None:
         from ..mathfmt import format_for_export
 
+        self._refresh_kp_filter()      # 先按当前学科/状态收窄知识点下拉框
         questions = self.store.list_questions(
-            limit=800, status=self.filter_status.get(), subject=self.filter_subject.get())
+            limit=800, status=self.filter_status.get(), subject=self.filter_subject.get(),
+            knowledge=self._selected_knowledge())
         self.q_tree.delete(*self.q_tree.get_children())
         for q in questions:
             # 列表里显示可读写法（x² 而不是 $x^2$）；公式的图形排版留给报告页
             stem = format_for_export((q.get("stem") or "").replace("\n", " "))[:60]
+            kp = "、".join(str(k) for k in (q.get("knowledge_points") or []))
             self.q_tree.insert("", "end", iid=q["uid"], values=(
-                q.get("uid"), q.get("subject", ""), q.get("qtype", ""),
+                q.get("uid"), q.get("subject", ""), kp[:18] or "—", q.get("qtype", ""),
                 STATUS_CN.get(q.get("status"), ""), stem),
                 tags=(str(q.get("status")),))
+
+    def _selected_knowledge(self) -> str:
+        """下拉框里显示的是「复数（3）」，这里换回真正的知识点名「复数」。"""
+        return self._kp_map.get(self.filter_knowledge.get(), "")
+
+    def _refresh_kp_filter(self) -> None:
+        """把题库里出现过的知识点填进筛选下拉框（跟着学科/状态的筛选一起收窄）。
+
+        知识点来自识别时模型给出的 ``knowledge_points``（如"复数"、"单位根"），
+        所以导入并识别完一道题，它的知识点就会出现在这个下拉框里，选一下即可筛出同类题。
+        """
+        try:
+            items = self.store.knowledge_points(subject=self.filter_subject.get(),
+                                                status=self.filter_status.get())
+        except Exception as exc:      # 下拉框出问题不该拖垮整个题库刷新
+            log.warning("读取知识点列表失败：%s", exc)
+            items = []
+        self._kp_map = {KP_ALL: ""}
+        for it in items:
+            self._kp_map[f"{it['name']}（{it['count']}）"] = it["name"]
+        values = list(self._kp_map)
+        self.kp_combo.configure(values=values)
+        if self.filter_knowledge.get() not in self._kp_map:
+            # 之前选的知识点在当前学科/状态下已经不存在了 → 回到「全部知识点」
+            self.filter_knowledge.set(KP_ALL)
 
     def on_question_select(self) -> None:
         sel = self.q_tree.selection()

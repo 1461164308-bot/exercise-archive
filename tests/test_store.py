@@ -137,6 +137,58 @@ class StoreTest(unittest.TestCase):
         self.assertEqual([x["uid"] for x in st.search(keyword="明文模式")], [q])
         st.close()
 
+    def test_11_knowledge_points_listing(self):
+        """知识点清单：按题数降序，题数相同按名字排（用来填筛选下拉框）。"""
+        items = self.st.knowledge_points()
+        names = [i["name"] for i in items]
+        self.assertEqual(sorted(names), sorted(["导数", "函数值", "定积分"]))
+        self.assertTrue(all(i["count"] == 1 for i in items))
+        # 跟着学科/状态一起收窄（题数相同时按名字排，所以顺序是确定的）
+        self.assertEqual([i["name"] for i in self.st.knowledge_points(subject="英语")], [])
+        self.assertEqual([i["name"] for i in self.st.knowledge_points(subject="数学", status="wrong")],
+                         ["函数值", "导数"])
+        self.assertEqual([i["name"] for i in self.st.knowledge_points(status="blank")], ["定积分"])
+
+    def test_12_filter_by_knowledge_point(self):
+        """按知识点筛选：**精确匹配数组里的一项**。"""
+        self.assertEqual([q["uid"] for q in self.st.list_questions(knowledge="导数")], [self.q1])
+        self.assertEqual([q["uid"] for q in self.st.list_questions(knowledge="定积分")], [self.q2])
+        self.assertEqual(self.st.list_questions(knowledge="量子力学"), [])
+        # 与其它条件叠加
+        self.assertEqual(self.st.list_questions(knowledge="导数", subject="英语"), [])
+        self.assertEqual([q["uid"] for q in self.st.list_questions(knowledge="导数", subject="数学")],
+                         [self.q1])
+
+    def test_13_knowledge_filter_is_exact_not_substring(self):
+        """关键：筛「复数」不能把「复数的几何表示」也捞进来（反之亦然）。
+
+        知识点存在一个 JSON 数组里，用 ``LIKE '%"复数"%'`` 匹配整个数组项 ——
+        带引号是为了卡住边界。这里就守这个边界。
+        """
+        uid = self.st.add_question(
+            {"stem": "求六次单位根", "status": "wrong", "subject": "数学",
+             "knowledge_points": ["复数", "单位根", "复数的几何表示"]},
+            self.iid, "x.png")
+        self.assertIn(uid, [q["uid"] for q in self.st.list_questions(knowledge="复数")])
+        self.assertIn(uid, [q["uid"] for q in self.st.list_questions(knowledge="复数的几何表示")])
+        # 「单位根」这一项只能命中这道题，不能命中别的题
+        self.assertEqual([q["uid"] for q in self.st.list_questions(knowledge="单位根")], [uid])
+        # 不存在的近似名不能命中
+        self.assertEqual(self.st.list_questions(knowledge="复数几何"), [])
+        self.st.delete_questions([uid])
+
+    def test_14_knowledge_filter_escapes_like_wildcards(self):
+        """知识点名里带 % 或 _ 时，不能把它当 SQL 通配符（否则会捞出一堆无关题）。"""
+        uid = self.st.add_question(
+            {"stem": "百分号知识点测试", "status": "correct", "subject": "数学",
+             "knowledge_points": ["增长率%"]},
+            self.iid, "x.png")
+        self.assertEqual([q["uid"] for q in self.st.list_questions(knowledge="增长率%")], [uid])
+        # 通配符若没转义，"%" 会匹配任意内容，把 Q1/Q2 也捞进来
+        self.assertNotIn(self.q1, [q["uid"] for q in self.st.list_questions(knowledge="增长率%")])
+        self.assertEqual(self.st.list_questions(knowledge="增长率_"), [])
+        self.st.delete_questions([uid])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

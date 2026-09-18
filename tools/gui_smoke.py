@@ -229,8 +229,20 @@ def main() -> int:
                 app.load_into_editor()
                 app.editor.auto_deskew()
             shot(name)
+        # 左栏「题库」页单独截一张：知识点筛选下拉框在这里，
+        # 而上面 6 张截的都是中间页签（左栏一直停在"待识别图片"），这项功能就没进过证据。
+        try:
+            app.left_nb.select(1)
+            app.refresh_questions()
+            app.update()
+            shot("题库-知识点筛选")
+            app.left_nb.select(0)
+        except Exception as exc:
+            print(f"   （题库页截图跳过：{exc}）")
         checks = {
             "题库行数": len(app.q_tree.get_children()),
+            "知识点筛选项": len([v for v in app.kp_combo.cget("values")
+                                 if v != "全部知识点"]),
             "搜索结果数": len(app.search_tree.get_children()),
             "统计卡片-题目总数": app.card_questions.value_var.get(),
             "学科占比图元数": len(app.chart_subject.find_all()),

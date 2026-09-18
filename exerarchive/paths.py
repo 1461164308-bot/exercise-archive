@@ -15,7 +15,10 @@ from pathlib import Path
 
 APP_NAME = "AI本地错题习题归档整理工具"
 APP_EN = "exerarchive"
-APP_VERSION = "1.0.0"
+# 版本号：界面标题、关于页、交付 zip 名、诊断 JSON 都用它。
+# 1.0.1：识别变慢的可见化与「重新加载模型」按钮（见 verify/验收报告.md 第七章）
+# 1.0.2：按知识点分类与筛选；命令名终止空格/求和上下限等公式排版修复
+APP_VERSION = "1.0.2"
 
 # 图片扩展名（导入对话框、拖拽过滤、目录扫描统一用它）
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff", ".webp"}

@@ -380,7 +380,8 @@ class Store:
 
     def list_questions(self, limit: int = 500, offset: int = 0, image_id: Optional[int] = None,
                        status: str = "", subject: str = "", qtype: str = "", grade: str = "",
-                       order: str = "q.id DESC") -> List[Dict]:
+                       knowledge: str = "", order: str = "q.id DESC") -> List[Dict]:
+        """按条件列出题目。``knowledge`` 是**知识点精确匹配**（见 :meth:`_knowledge_like`）。"""
         sql = self._Q_SELECT + " WHERE 1=1"
         params: List = []
         if image_id:
@@ -390,9 +391,59 @@ class Store:
             if val:
                 sql += f" AND q.{col}=?"
                 params.append(val)
+        if knowledge:
+            like, param = self._knowledge_like(knowledge)
+            sql += f" AND {like}"
+            params.append(param)
         sql += f" ORDER BY {order} LIMIT ? OFFSET ?"
         params += [limit, offset]
         return [self._row_to_question(r) for r in self._query(sql, params)]
+
+    # ------------------------------------------------------------------ #
+    # 知识点（分类维度之一）
+    # ------------------------------------------------------------------ #
+    @staticmethod
+    def _like_escape(text: str) -> str:
+        """转义 LIKE 的通配符，避免知识点名里的 % _ 被当成通配符。"""
+        return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+    @classmethod
+    def _knowledge_like(cls, knowledge: str):
+        """知识点筛选的 SQL 片段与参数（**精确匹配数组里的某一项**）。
+
+        ``knowledge`` 列存的是明文 JSON 数组（如 ``["复数","单位根"]``），所以用
+        ``LIKE '%"复数"%'`` 能精确命中"某一项正好是复数"：
+        既不会漏（不依赖顺序/位置），也不会误伤 —— ``"复数的几何表示"`` 里虽然含"复数"，
+        但后面紧跟的是"的"而不是引号，匹配不上。
+        """
+        return "q.knowledge LIKE ? ESCAPE '\\'", f'%"{cls._like_escape(knowledge)}"%'
+
+    def knowledge_points(self, subject: str = "", status: str = "", limit: int = 300) -> List[Dict]:
+        """题库里出现过的知识点及题数（按题数降序），用来填筛选下拉框。
+
+        返回 ``[{"name": "复数", "count": 3}, …]``。
+        只统计 ``questions.knowledge`` 这一列（识别时模型给出的知识点），不依赖报告是否已生成。
+        """
+        sql = "SELECT knowledge FROM questions WHERE knowledge IS NOT NULL AND knowledge != ''"
+        params: List = []
+        for col, val in (("subject", subject), ("status", status)):
+            if val:
+                sql += f" AND {col}=?"
+                params.append(val)
+        counts: Dict[str, int] = {}
+        for row in self._query(sql, params):
+            try:
+                names = json.loads(row["knowledge"] or "[]")
+            except Exception:
+                continue
+            if not isinstance(names, list):
+                continue
+            for name in names:
+                name = str(name).strip()
+                if name:
+                    counts[name] = counts.get(name, 0) + 1
+        ordered = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
+        return [{"name": n, "count": c} for n, c in ordered[:limit]]
 
     def get_question(self, uid: str) -> Optional[Dict]:
         rows = self._query(self._Q_SELECT + " WHERE q.uid=?", (uid,))

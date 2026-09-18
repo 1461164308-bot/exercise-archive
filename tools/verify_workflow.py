@@ -167,7 +167,7 @@ def test_cli(cloud: MockCloud, data_dir: str) -> None:
 # --------------------------------------------------------------------------- #
 def test_gui(cloud: MockCloud, data_dir: str) -> None:
     print("\n二、图形界面全流程（导入 → 识别 → 编辑 → 标签 → 导出 → 备份 → 搜索 → 删除）")
-    from exerarchive.ui.app import MainWindow
+    from exerarchive.ui.app import KP_ALL, MainWindow
 
     app = MainWindow()
     app.geometry("1400x880+10+10")
@@ -209,6 +209,48 @@ def test_gui(cloud: MockCloud, data_dir: str) -> None:
     check("学科占比图已绘制", len(app.chart_subject.find_all()) >= 1)
     check("薄弱知识点图已绘制", len(app.chart_weak.find_all()) >= 1)
     check("归档目录树已刷新", len(app.archive_tree.get_children()) >= 1)
+
+    # 3a) 知识点分类与筛选：识别出的知识点要进下拉框，选中后题库列表只剩同类题
+    kp_names = [it["name"] for it in app.store.knowledge_points()]
+    check("识别出的知识点进了题库统计", bool(kp_names), "、".join(kp_names))
+    kp_values = list(app.kp_combo.cget("values"))
+    real_kps = [v for v in kp_values if v != KP_ALL]
+    check("知识点筛选下拉框已填充", bool(real_kps), "、".join(kp_values))
+    check("下拉框默认是「全部知识点」", app.filter_knowledge.get() == KP_ALL,
+          app.filter_knowledge.get())
+    # 知识点列要真的显示出来（不是空列）
+    kp_col = [app.q_tree.set(i, "kp") for i in app.q_tree.get_children()]
+    check("题库列表的知识点列有内容", any(v and v != "—" for v in kp_col), "、".join(kp_col))
+    # 选中第一个真实知识点 → 只剩带这个知识点的题
+    if real_kps:
+        target = real_kps[0]
+        kp_name = app._kp_map[target]
+        app.filter_knowledge.set(target)
+        app.refresh_questions()
+        app.update()
+        kept = app.q_tree.get_children()
+        all_have = all(kp_name in app.q_tree.set(i, "kp") for i in kept)
+        check(f"按知识点「{kp_name}」筛选后只剩同类题（{len(kept)} 道）", bool(kept) and all_have,
+              "、".join(app.q_tree.set(i, "kp") for i in kept))
+        check("筛选结果确实变少了", len(kept) < 3, f"{len(kept)} / 3")
+        # 换学科时，该学科下没有的知识点要从下拉框里消失、选中项回到「全部」
+        app.filter_knowledge.set(target)
+        app.filter_subject.set("英语")
+        app.refresh_questions()
+        app.update()
+        check("换学科后知识点下拉框跟着收窄",
+              all(v == KP_ALL or app._kp_map[v] in
+                  [it["name"] for it in app.store.knowledge_points(subject="英语")]
+                  for v in app.kp_combo.cget("values")),
+              "、".join(app.kp_combo.cget("values")))
+        check("选中的知识点在本学科下不存在时回到「全部知识点」",
+              app.filter_knowledge.get() == KP_ALL, app.filter_knowledge.get())
+        app.filter_subject.set("")
+        app.filter_knowledge.set(KP_ALL)
+        app.refresh_questions()
+        app.update()
+        check("切回「全部知识点」后恢复全部题", len(app.q_tree.get_children()) == 3)
+
     # 预览画布必须真的显示出图片：这个曾经一直是空白（PhotoImage 建不出来），
     # 但界面能开、列表也有数据，不专门断言就发现不了
     check("预览画布已显示图片", app.preview._photo is not None,

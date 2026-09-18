@@ -212,7 +212,8 @@ class SettingsDialog(tk.Toplevel):
         ttk.Button(r, text="浏览", width=6, command=lambda: self._pick_dir("archive.root")).pack(side="left")
         ttk.Label(tab, text="　　留空 = data/归档", style="Muted.TLabel").pack(anchor="w", pady=(0, 6))
         self._row(tab, "目录模板", "archive.pattern",
-                  "可用变量：{subject} {grade} {qtype} {status} {year} {month} {source}")
+                  "可用变量：{subject} {subject_detail} {grade} {qtype} {status} {knowledge} "
+                  "{year} {month} {source}（{knowledge} 取该题第一个知识点，如「复数」）")
         self._row(tab, "文件名模板", "archive.naming", "可用变量：{uid} {status} {subject} {qtype}")
         for key, text in (("archive.write_text", "归档时写 Markdown 文字稿"),
                           ("archive.write_report", "归档时写错题分析报告"),
