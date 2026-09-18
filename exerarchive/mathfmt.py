@@ -280,6 +280,19 @@ _TEXT_SPAN_RE = re.compile(
                          "operatorname", "mbox")) + r")\s*\{[^{}]*\}")
 
 
+# 希腊字母被写成拉丁字母名（模型经常这么干：`2pi r`、`omega^n`、`theta_1`）。
+# 只在**独立成词**时转换：`spin`、`pixel`、`capital` 这类英文单词不受影响；
+# 前面已经带反斜杠的（`\pi`）不重复转换。
+_GREEK_WORDS = (
+    "alpha", "beta", "gamma", "delta", "epsilon", "varepsilon", "zeta", "eta",
+    "theta", "vartheta", "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho",
+    "sigma", "tau", "upsilon", "phi", "varphi", "chi", "psi", "omega",
+)
+_GREEK_WORD_RE = re.compile(
+    r"(?<![A-Za-z\\])(" + "|".join(sorted(_GREEK_WORDS, key=len, reverse=True)) + r")(?![A-Za-z])"
+)
+
+
 def stack_fractions(latex: str) -> str:
     """把数学模式里的 ``A/B`` 转成竖排分数 ``\\frac{A}{B}``（课本写法）。
 
@@ -374,6 +387,20 @@ def normalize_math_text(text: str) -> str:
     # 紧跟 ^ 的连续字母数字（没花括号）包起来
     s = re.sub(r"\^(\s*)(?!\{)(-?[0-9A-Za-z]{2,})", lambda m: "^{" + m.group(2) + "}", s)
     s = re.sub(r"_(\s*)(?!\{)([0-9A-Za-z]{2,})", lambda m: "_{" + m.group(2) + "}", s)
+
+    # 希腊字母的拉丁写法 → 真希腊字母（`2pi r` → `2\pi r`，画出来才是 π 而不是 "pi"）。
+    # 必须放在上面「^ 后面补花括号」之后：先转的话 `x^\pi` 会被分词器当成
+    # 「上标参数是那个反斜杠」，画出一个孤零零的 "\"。
+    spans: List[str] = []
+
+    def _stash_span(m: re.Match) -> str:
+        spans.append(m.group(0))
+        return f"\x01{len(spans) - 1}\x02"
+
+    s = _TEXT_SPAN_RE.sub(_stash_span, s)          # \text{spin} 里的单词不能被动
+    s = _GREEK_WORD_RE.sub(lambda m: "\\" + m.group(1), s)
+    s = re.sub(r"\x01(\d+)\x02", lambda m: spans[int(m.group(1))], s)
+
     # 除法改成竖排分数（课本写法；斜杠在角标里尤其难读）
     s = stack_fractions(s)
     return s

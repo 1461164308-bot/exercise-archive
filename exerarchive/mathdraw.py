@@ -403,17 +403,48 @@ _OPENERS = "([{|,;:"
 # 这些位置上的 + - 是一元符号（如 -b、x^{-1}、(a, -b)），不留间距
 _UNARY_BEFORE = set("([{|,;:^_") | set(_REL_CHARS) | set(_BIN_CHARS)
 
+# 函数名/算子名：LaTeX 在它们后面留一个细空格（``\sin x`` 排成 "sin x" 而不是 "sinx"）。
+# 注意 ``\pi`` 这类**符号**不在此列 —— 符号后面不留空格（``\pi r`` 就是 "πr"）。
+_OPNAME_CMDS = {
+    "sin", "cos", "tan", "cot", "sec", "csc", "arcsin", "arccos", "arctan",
+    "sinh", "cosh", "tanh", "log", "ln", "lg", "exp", "mod",
+}
+# 上下限要排在**正上方/正下方**的算符（LaTeX 里带 \limits 的那批）。
+# 求和/连乘是符号，lim/max/min 是函数名，两类都算。
+_BIGOP_SYMBOLS = {
+    "sum", "prod", "coprod", "bigcup", "bigcap", "bigvee", "bigwedge",
+    "bigoplus", "bigotimes", "bigodot", "biguplus", "bigsqcup",
+}
+_LIMITS_CMDS = _BIGOP_SYMBOLS | {
+    "lim", "max", "min", "sup", "inf", "det", "gcd", "arg", "dim", "ker", "hom", "deg",
+}
+# 带上限时算符符号放大的倍数：课本里 Σ/∏ 明显比正文大一圈（LaTeX display style 同理）。
+# 只放大**符号**，不放大 lim/max 这类函数名（那是单词，放大就不像了）。
+_BIGOP_GROW = 1.30
+# 紧跟在这些字符后面时，函数名不需要补细空格（``\lim_{x\to 0}``、``\sin^2 x``）
+_NO_SPACE_AFTER_OP = set("^_}]),;:")
+
 
 def _auto_space(latex: str) -> str:
     """给运算符两侧补上数学间距（LaTeX 会自动做，我们得自己来）。
 
     不做的话 ``x=1``、``a+b`` 会挤在一起，看着不像课本（用户反馈"看着奇怪"）。
     ``\\text{...}`` 里的内容原样不动；一元符号（``-b``、``x^{-1}``）不加间距。
+
+    另一件同样重要的事：**命令名后面的空格不能一律丢掉**。
+    ``\\pi r`` 丢掉空格就成了 ``\\pir``（不存在的命令），于是 π 被当成字面文本画成 "pir"
+    —— 用户报过「pi 没有用圆周率符号表示」，根因就在这里。
+    LaTeX 里那个空格正是命令名的终止符，必须留住；函数名（``\\sin x``）后面还要再补一个细空格。
     """
     src = latex or ""
     out: List[str] = []
     i, n = 0, len(src)
     depth_prev = ""            # 上一个有意义的字符（判断是否一元上下文）
+    # 上下标（script style）里**不加**关系符/运算符间距 —— TeX 的规则：
+    # mu 间距只在 display/text style 里插，script/scriptscript 不插。
+    # 所以课本里 Σ 下面的限写作 "k=0"、"i=1"、"x→0"，而不是 "k = 0"。
+    brace_ctx: List[bool] = []     # 每层 { 记录：它是不是 ^/_ 的参数
+    script_next = False
     while i < n:
         ch = src[i]
         if ch == "\\":
@@ -433,40 +464,69 @@ def _auto_space(latex: str) -> str:
                         j += 1
                     out.append(src[i:j])
                     i = j
+                # 函数名后面补细空格：`\sin x` 要排成 "sin x"，而不是挤成 "sinx"
+                elif cmd[1:] in _OPNAME_CMDS:
+                    j = i
+                    while j < n and src[j] in " \t":
+                        j += 1
+                    if j < n and src[j] not in _NO_SPACE_AFTER_OP:
+                        out.append("\\,")
+                        i = j                 # 原来的空格被这个细空格取代
                 depth_prev = cmd
+                script_next = False
                 continue
         if ch in _REL_CHARS:
-            out.append("\\:" if depth_prev not in ("", "\\:") else "")
-            out.append(ch)
-            out.append("\\:")
+            if any(brace_ctx):
+                out.append(ch)                  # 上下标里：紧排
+            else:
+                out.append("\\:" if depth_prev not in ("", "\\:") else "")
+                out.append(ch)
+                out.append("\\:")
             depth_prev = ch
+            script_next = False
             i += 1
             continue
         if ch in _BIN_CHARS:
-            if depth_prev in ("",) or depth_prev in _UNARY_BEFORE:
-                out.append(ch)              # 一元：不加间距
+            if any(brace_ctx):
+                out.append(ch)                  # 上下标里：紧排
+            elif depth_prev in ("",) or depth_prev in _UNARY_BEFORE:
+                out.append(ch)                  # 一元：不加间距
             else:
                 out.append("\\,")
                 out.append(ch)
                 out.append("\\,")
             depth_prev = ch
+            script_next = False
             i += 1
             continue
         if ch in "{":
             out.append(ch)
+            brace_ctx.append(script_next)
+            script_next = False
             depth_prev = ""                 # 组开头 → 视为一元上下文
             i += 1
             continue
         if ch == "}":
             out.append(ch)
+            if brace_ctx:
+                brace_ctx.pop()
             i += 1
             continue
         if ch in " \t":
-            i += 1                          # 源码空白本来就该丢
+            # 数学模式里空格一般只是分隔符，可以丢 —— 但**命令名后面那个空格不能丢**：
+            # `\pi r` 丢掉空格就成了 `\pir`（不存在的命令），π 于是被画成字面文本 "pir"。
+            # 只有「上一个输出是命令名」且「下一个非空字符是字母」时才保留这一个空格。
+            nxt = src[i + 1] if i + 1 < n else ""
+            if re.fullmatch(r"\\[A-Za-z]+", depth_prev or "") and nxt.isalpha():
+                out.append(" ")
+            i += 1
             continue
         out.append(ch)
-        if ch not in "^_":
+        if ch in "^_":
+            script_next = True
+        elif ch not in "^_":
             depth_prev = ch
+            script_next = False
         i += 1
     return "".join(out)
 
@@ -666,7 +726,12 @@ class Renderer:
                 else:
                     i += 1
             elif kind == "cmd":
-                atoms.append(self.plain(CMD_SYMBOLS.get(value, value), size))
+                atom = self.plain(CMD_SYMBOLS.get(value, value), size)
+                if value in _LIMITS_CMDS:
+                    # 标记成「大算符」：上下限要排在正上/正下方，而不是像 x^2 那样甩到右边
+                    atom["limits"] = True
+                    atom["grow"] = value in _BIGOP_SYMBOLS
+                atoms.append(atom)
                 i += 1
             elif kind == "group":
                 atoms.append(self.layout(value, size))
@@ -684,9 +749,15 @@ class Renderer:
                         i = j
                     else:
                         base = atoms.pop()
-                        atoms.append(self.script_box(
-                            base, arg if text[0] == "^" else None,
-                            arg if text[0] == "_" else None, size))
+                        sup_arg = arg if text[0] == "^" else None
+                        sub_arg = arg if text[0] == "_" else None
+                        # 大算符（Σ/∏/lim…）的上下限排正上/正下方；
+                        # 注意 base 也可能是**已经带上限的 bigop 盒**（\sum_a^b 分两次进来），
+                        # 那时同样要并进去，否则第二个限又会甩到右边（"岔开"就是这么来的）。
+                        if base.get("limits") or base.get("kind") == "bigop":
+                            atoms.append(self.limits_box(base, sup_arg, sub_arg, size))
+                        else:
+                            atoms.append(self.script_box(base, sup_arg, sub_arg, size))
                         i = j
                     continue
                 j = i + 1
@@ -728,6 +799,49 @@ class Renderer:
 
     def scripted(self, base: str, sup, sub_, size: int) -> dict:
         return self.script_box(self.plain(base, size), sup, sub_, size)
+
+    def limits_box(self, base_box: dict, sup, sub_, size: int) -> dict:
+        """把上/下限排在算符的**正上方、正下方**（求和、连乘、lim 这类大算符的教科书写法）。
+
+        与 :meth:`script_box` 的区别：script_box 把上下标甩到符号**右侧**（``x^2`` 那样），
+        而大算符按 LaTeX 的 display style 是**居中排在正上/正下**。
+        用户报过「求和符号的上下参数岔开了」，就是它被当成了普通上标 —— 画出来像
+        ``Σ_{k=0}^{n-1}`` 那样斜着拖在右边，而不是课本里的 ``Σ`` 上下一摞。
+
+        ``\\sum_a^b`` 会分两次进来（先 ``_`` 后 ``^``，或反过来），所以第二次要把第一个并进来。
+        """
+        sub_size = max(8, int(size * 0.70))
+        if base_box.get("kind") == "bigop":
+            base = base_box["base"]
+            gap = base_box["gap"]
+            sup_box = self.layout(sup, sub_size) if sup else base_box.get("sup")
+            sub_box = self.layout(sub_, sub_size) if sub_ else base_box.get("sub")
+        else:
+            # Σ/∏ 这类**符号**放大一档，上下限才不至于比符号还显眼（课本就是这个比例）；
+            # lim/max 这类函数名保持原字号。
+            if base_box.get("grow"):
+                op_size = max(base_box["size"] + 1, int(round(base_box["size"] * _BIGOP_GROW)))
+                base = self.plain(base_box["text"], op_size)
+            else:
+                base = base_box
+            gap = max(1, int(size * 0.08))
+            sup_box = self.layout(sup, sub_size) if sup else None
+            sub_box = self.layout(sub_, sub_size) if sub_ else None
+
+        # 用**实测墨迹**而不是 plain() 的固定比例来定上下限位置：Σ/∏ 的字形只占字号的一部分，
+        # 按 0.72em 排会让上下限离符号很远 —— 观感上"岔开"有一半来自这里。
+        if base.get("kind") == "text":
+            ink_asc, ink_desc, _h = self.c.glyph_ink(base["text"], base["size"])
+        else:
+            ink_asc, ink_desc = base["above"], base["below"]
+        width = max([base["width"]] + [b["width"] for b in (sup_box, sub_box) if b])
+        above = max(base["above"],
+                    ink_asc + (gap + sup_box["above"] + sup_box["below"] if sup_box else 0))
+        below = max(base["below"],
+                    ink_desc + (gap + sub_box["above"] + sub_box["below"] if sub_box else 0))
+        return {"kind": "bigop", "base": base, "sup": sup_box, "sub": sub_box, "gap": gap,
+                "ink_asc": ink_asc, "ink_desc": ink_desc,
+                "width": width, "above": above, "below": below, "size": size}
 
     def script_box(self, base_box: dict, sup, sub_, size: int) -> dict:
         """给任意原子加下上标（底也可以是分式、根号、整组）。"""
@@ -857,6 +971,20 @@ class Renderer:
                 self.draw(sub_, x + dx, baseline + drop)
                 x += dx + sub_["width"]
             return x
+        if kind == "bigop":
+            # 大算符：上下限居中排在正上方/正下方（见 limits_box）
+            base, sup, sub_ = box["base"], box["sup"], box["sub"]
+            gap = box["gap"]
+            asc = box.get("ink_asc", base["above"])
+            desc = box.get("ink_desc", base["below"])
+            self.draw(base, x + (box["width"] - base["width"]) // 2, baseline)
+            if sup:
+                self.draw(sup, x + (box["width"] - sup["width"]) // 2,
+                          baseline - asc - gap - sup["below"])
+            if sub_:
+                self.draw(sub_, x + (box["width"] - sub_["width"]) // 2,
+                          baseline + desc + gap + sub_["above"])
+            return x + box["width"]
         if kind == "frac":
             num, den = box["num"], box["den"]
             bar_y = baseline - box["above"] + num["above"] + num["below"] + box["gap"]

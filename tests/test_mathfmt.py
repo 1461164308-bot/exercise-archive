@@ -283,6 +283,123 @@ class RenderTest(unittest.TestCase):
             img, _ = mathdraw.render_image(latex, size_px=24)
             self.assertGreaterEqual(img.w, 1)
 
+    # ------------------------------------------------------------------ #
+    # 用户报过的两个排版 bug（求和上下限"岔开"、pi 没变成圆周率符号）
+    # ------------------------------------------------------------------ #
+    def _ink_rows(self, img) -> list:
+        """每一行是否有墨迹。"""
+        return [any(img.data[y * img.w * 3 + x * 3] < 200 for x in range(img.w))
+                for y in range(img.h)]
+
+    def _ink_center_x(self, img, y0: int, y1: int):
+        """给定行范围内的墨迹水平中心（无墨迹返回 None）。"""
+        cols = [x for y in range(max(0, y0), min(img.h, y1)) for x in range(img.w)
+                if img.data[y * img.w * 3 + x * 3] < 200]
+        return (min(cols) + max(cols)) / 2.0 if cols else None
+
+    def test_30_pi_followed_by_letter_renders_as_pi(self):
+        r"""``\pi r`` 必须画成 πr，而不是字面的 "pir"。
+
+        根因（接管后修的）：``_auto_space`` 把**命令名后面的空格**也当"源码空白"丢了，
+        ``\pi r`` → ``\pir``（不存在的命令）→ 回退成字面文本 "pir"。
+        用户报过「pi 没有用圆周率符号表示」。
+        """
+        # 与「πr」逐像素相同 —— 说明真的画成了 π
+        as_cmd, _ = mathdraw.render_image(r"\pi r", size_px=24)
+        as_glyph, _ = mathdraw.render_image("πr", size_px=24)
+        self.assertEqual(bytes(as_cmd.data), bytes(as_glyph.data),
+                         r"\pi r 没有渲染成 πr（多半又退化成字面文本了）")
+        # 与字面的 "pir" 必须不同，而且更窄（π 是一个字，pi 是两个字）
+        literal, _ = mathdraw.render_image("pir", size_px=24)
+        self.assertNotEqual(bytes(as_cmd.data), bytes(literal.data))
+        self.assertLess(as_cmd.w, literal.w, "πr 应当比字面的 pir 窄")
+
+    def test_31_command_name_terminator_survives_autospace(self):
+        """`\\pi r`、`\\sin x` 这类「命令名 + 空格 + 字母」不能被粘成一个命令名。"""
+        from exerarchive.mathdraw import _auto_space
+
+        self.assertNotIn(r"\pir", _auto_space(r"2\pi r"))
+        self.assertIn(r"\pi", _auto_space(r"2\pi r"))
+        # 函数名后面还要补细空格（`\sin x` → "sin x"，不是 "sinx"）
+        self.assertIn(r"\sin\,", _auto_space(r"\sin x"))
+        # 但 `\lim_{...}`、`\sin^2 x` 不能多出空格
+        self.assertNotIn(r"\lim\,", _auto_space(r"\lim_{x\to 0}"))
+        self.assertNotIn(r"\sin\,^", _auto_space(r"\sin^2 x"))
+
+    def test_32_bare_greek_names_become_symbols(self):
+        """模型把希腊字母写成拉丁名（`2pi r`、`omega^n`）也要变成 π / ω。"""
+        self.assertEqual(mathfmt.normalize_math_text("2pi r"), r"2\pi r")
+        self.assertEqual(mathfmt.normalize_math_text("omega^n"), r"\omega^n")
+        self.assertEqual(mathfmt.normalize_math_text("x^pi"), r"x^{\pi}")
+        # 英文单词与 \text{} 里的内容不能被误伤
+        for word in ("spin x", "pixel", r"\text{spin}", "capital"):
+            self.assertEqual(mathfmt.normalize_math_text(word), word, f"误伤了 {word}")
+        # 渲染层面：裸 pi 与 \pi 必须逐像素一致
+        a, _ = mathdraw.render_image(mathfmt.normalize_math_text("2pi r"), size_px=24)
+        b, _ = mathdraw.render_image(r"2\pi r", size_px=24)
+        self.assertEqual(bytes(a.data), bytes(b.data), "裸 pi 与 \\pi 的渲染结果不一致")
+
+    def test_33_sum_limits_sit_centered_above_and_below(self):
+        """求和符号的上下限要排在**正上/正下方并水平居中**，而不是甩到右边。
+
+        用户报过「求和符号的上下参数岔开了」—— 那时上下限被当成普通上下标，
+        斜着拖在 Σ 右侧（``Σ_{k=0}^{n-1}``），不是课本里的上下两摞。
+        """
+        img, _ = mathdraw.render_image(r"\sum_{k=0}^{n-1}", size_px=24)
+        sum_only, _ = mathdraw.render_image(r"\sum", size_px=24)
+        self.assertGreater(img.h, sum_only.h + 6, "上下限没有把高度撑开（说明没排在上下方）")
+
+        rows = self._ink_rows(img)
+        top_y = rows.index(True)
+        bot_y = len(rows) - 1 - rows[::-1].index(True)
+        band = max(4, img.h // 5)
+        mid = img.w / 2.0
+        top_c = self._ink_center_x(img, top_y, top_y + band)
+        bot_c = self._ink_center_x(img, bot_y - band, bot_y + 1)
+        self.assertIsNotNone(top_c)
+        self.assertIsNotNone(bot_c)
+        self.assertLess(abs(top_c - mid), img.w * 0.22,
+                        f"上限没有居中在 Σ 正上方：中心 {top_c}，整图中心 {mid}")
+        self.assertLess(abs(bot_c - mid), img.w * 0.22,
+                        f"下限没有居中在 Σ 正下方：中心 {bot_c}，整图中心 {mid}")
+
+    def test_34_limits_do_not_widen_the_formula(self):
+        """上下限排在正上下方时，宽度由最宽的一层决定，不会像右侧上下标那样把式子拉长。"""
+        with_limits, _ = mathdraw.render_image(r"\sum_{k=0}^{n-1}", size_px=24)
+        sum_only, _ = mathdraw.render_image(r"\sum", size_px=24)
+        # 旧行为（限在右侧）会把宽度加成 Σ + 限的宽度；现在只取最大者
+        self.assertLess(with_limits.w, sum_only.w + 40,
+                        f"宽度像是把上下限并排加了进去：{with_limits.w} vs Σ 本身 {sum_only.w}")
+
+    def test_35_prod_and_lim_also_stack_limits(self):
+        """连乘与 lim/max 是同一类算符，上下限同样排在上下方。"""
+        for latex, base_latex in ((r"\prod_{i=1}^{n}", r"\prod"),
+                                  (r"\lim_{x\to 0}", r"\lim"),
+                                  (r"\max_{x\in A}", r"\max")):
+            img, _ = mathdraw.render_image(latex, size_px=24)
+            plain, _ = mathdraw.render_image(base_latex, size_px=24)
+            self.assertGreater(img.h, plain.h + 4, f"{latex} 的限没有排在上下方")
+
+    def test_36_integral_limits_stay_on_the_side(self):
+        """积分是**有意例外**：中文课本里习惯把上下限写在右边（∫₀¹），保持不动。"""
+        img, _ = mathdraw.render_image(r"\int_0^1", size_px=24)
+        plain, _ = mathdraw.render_image(r"\int", size_px=24)
+        self.assertLess(img.h, plain.h * 2.2, "积分上下限不该被排成上下两摞")
+
+    def test_37_script_style_has_no_operator_spacing(self):
+        """上下标里不加关系符/运算符间距（TeX 的 script style 规则）。
+
+        课本里 Σ 下面的限写作 ``k=0``、``i=1``，不是 ``k = 0``；同样 ``x^{n+1}`` 也不该
+        在指数里塞进间距。
+        """
+        from exerarchive.mathdraw import _auto_space
+
+        self.assertNotIn(r"\:", _auto_space(r"\sum_{k=0}^{n-1}"))
+        self.assertNotIn(r"\,", _auto_space(r"x^{n+1}"))
+        # 但正文层级（display/text style）的间距必须保留
+        self.assertIn(r"\:", _auto_space("x=1"))
+        self.assertIn(r"\,", _auto_space("a+b"))
+
     def test_25_supersample_is_sharper_and_same_size(self):
         """超采样：**墨迹尺寸**基本不变，但抗锯齿层次明显更多（治"小字号发虚"）。
 

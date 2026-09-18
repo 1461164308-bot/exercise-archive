@@ -239,13 +239,16 @@ def test_gui(cloud: MockCloud, data_dir: str) -> None:
         check("报告文本里没有残留 LaTeX 源码", "$" not in report_text and "\\frac" not in report_text)
         check("报告文本里公式转成了可读写法",
               any(ch in report_text for ch in ("×", "²", "−", "-2")), report_text[:40])
-        # 截图留证（公式在报告页里的实际观感）
+        # 截图留证（公式在报告页里的实际观感）。
+        # 文件名**故意和 gui_smoke 的不一样**：两者都写 verify/gui-错题分析.png 时，
+        # 后跑的 gui_smoke（一键验收的第 7 步）会把这张有公式的报告截图覆盖成空页面，
+        # 于是"公式在界面里的样子"这份证据每次验收完都刚好丢掉。
         app.nb.select(2)
         app.update_idletasks()
         app.update()
         time.sleep(0.4)
         app.update()
-        shot_path = os.path.join(ROOT, "verify", "gui-错题分析.png")
+        shot_path = os.path.join(ROOT, "verify", "gui-错题分析-公式.png")
         if capture_hwnd(app.winfo_id(), shot_path, use_screen=False):
             print(f"   已截图（公式排版）：{shot_path}")
         app.nb.select(0)
