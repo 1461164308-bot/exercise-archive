@@ -1,0 +1,90 @@
+{
+  "s1_math_choice.jpg": {
+    "subject": "数学",
+    "subject_detail": "高中数学·函数与导数（选择题）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+      "选择题",
+      "选择题",
+      "选择题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "blank"
+    ]
+  },
+  "s2_math_fill.jpg": {
+    "subject": "数学",
+    "subject_detail": "大学微积分（导数与积分、填空题）",
+    "grade": "大学",
+    "question_count": 3,
+    "types": [
+      "填空题",
+      "填空题",
+      "填空题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "correct",
+      "blank"
+    ]
+  },
+  "s3_math_solution.jpg": {
+    "subject": "数学",
+    "subject_detail": "大学线性代数（行列式、解答题）",
+    "grade": "大学",
+    "question_count": 1,
+    "types": [
+      "解答题"
+    ],
+    "expected_statuses": [
+      "wrong"
+    ]
+  },
+  "s4_english.jpg": {
+    "subject": "英语",
+    "subject_detail": "高中英语·语法与词汇（时态与非谓语）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+      "选择题",
+      "选择题",
+      "填空题"
+    ],
+    "expected_statuses": [
+      "wrong",
+      "correct",
+      "correct"
+    ]
+  },
+  "s5_physics.jpg": {
+    "subject": "物理",
+    "subject_detail": "高中物理·牛顿第二定律（斜面模型计算题）",
+    "grade": "高中",
+    "question_count": 1,
+    "types": [
+      "计算题"
+    ],
+    "expected_statuses": [
+      "wrong"
+    ]
+  },
+  "s6_math_tilted_blur.jpg": {
+    "subject": "数学",
+    "subject_detail": "高中数学·函数与导数（选择题，s1 的旋转模糊压暗带水印版本）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+      "选择题",
+      "选择题",
+      "选择题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "blank"
+    ]
+  }
+}

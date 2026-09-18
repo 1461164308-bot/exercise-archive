@@ -1,0 +1,100 @@
+{
+ "app": "AI本地错题习题归档整理工具",
+ "version": "1.0.0",
+ "generated_at": "2026-09-17 22:19:47",
+ "items": [
+  {
+   "name": "Python 版本",
+   "status": "✅",
+   "detail": "3.12.10（win32）",
+   "hint": ""
+  },
+  {
+   "name": "图形界面库 tkinter",
+   "status": "✅",
+   "detail": "可用（自带，无需安装）",
+   "hint": ""
+  },
+  {
+   "name": "磁盘剩余空间",
+   "status": "✅",
+   "detail": "599.6 GB（数据目录：C:\\deepseek\\exercise-archive\\data）",
+   "hint": ""
+  },
+  {
+   "name": "数据目录可写",
+   "status": "✅",
+   "detail": "C:\\deepseek\\exercise-archive\\data",
+   "hint": ""
+  },
+  {
+   "name": "加密模块自检",
+   "status": "✅",
+   "detail": "ChaCha20/HMAC 通过 RFC 8439 官方测试向量",
+   "hint": ""
+  },
+  {
+   "name": "数据库",
+   "status": "✅",
+   "detail": "可读写：C:\\deepseek\\exercise-archive\\data\\archive.db",
+   "hint": ""
+  },
+  {
+   "name": "图像解码后端",
+   "status": "✅",
+   "detail": "Windows GDI+",
+   "hint": ""
+  },
+  {
+   "name": "GDI+ 绘图",
+   "status": "✅",
+   "detail": "可用（导出 PDF/示例图需要）",
+   "hint": ""
+  },
+  {
+   "name": "中文字体渲染",
+   "status": "✅",
+   "detail": "SimHei 渲染出 2116 个笔画像素",
+   "hint": ""
+  },
+  {
+   "name": "显卡（NVIDIA）",
+   "status": "⚠️",
+   "detail": "NVIDIA GeForce RTX 3070：占用 88%，显存 4901/8192 MB（空闲 3.2 GB），温度 74°C",
+   "hint": "显存/GPU 现在被别的程序占着（游戏、渲染、浏览器视频都算），识别会明显变慢甚至超时；关掉它们再试，或把「送模型最长边」调小"
+  },
+  {
+   "name": "本地模型服务",
+   "status": "❌",
+   "detail": "未运行（ollama @ http://127.0.0.1:11434）",
+   "hint": "双击「启动.bat」后重试；或在设置里开启自动启动本地服务"
+  },
+  {
+   "name": "云端增强",
+   "status": "✅",
+   "detail": "未启用（当前：本地优先 + 云端兜底）",
+   "hint": "需要更深度的错题分析时，在设置里填 API Key 并勾选「启用云端增强」"
+  },
+  {
+   "name": "PDF 导出（浏览器打印）",
+   "status": "✅",
+   "detail": "找到：C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+   "hint": ""
+  },
+  {
+   "name": "Word 导出",
+   "status": "✅",
+   "detail": "内置 .docx 生成器（无需 Office）",
+   "hint": ""
+  },
+  {
+   "name": "归档目录",
+   "status": "✅",
+   "detail": "C:\\deepseek\\exercise-archive\\data\\归档",
+   "hint": ""
+  }
+ ],
+ "failed": 1,
+ "warned": 1,
+ "ok": false
+}

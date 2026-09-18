@@ -1,0 +1,28 @@
+# 行尾约定 —— 这条不是洁癖，是踩过坑的：
+# 缺陷表第 10 条：6 个 .bat 曾经是 LF 行尾，双击直接报「'xxx' 不是内部或外部命令」。
+# 所以 .bat 必须永远以 CRLF 检出，别的文本文件统一 LF，二进制照原样。
+* text=auto
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.txt text eol=lf
+
+# 二进制：别做任何行尾/编码转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.bmp binary
+*.gif binary
+*.ico binary
+*.docx binary
+*.pdf binary
+*.zip binary
+*.db binary
+*.key binary

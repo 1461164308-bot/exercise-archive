@@ -1,0 +1,26 @@
+# ---- 用户数据（题库、原图、归档、密钥、含 API Key 的配置）----
+# 绝对不要提交：data/config.json 里可能存着云端 API Key，data/archive.db 是你的题库
+data/
+
+# ---- Python 缓存 ----
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ---- 测试/验证临时产物（每次跑验证都会重建）----
+tests/_tmp/
+verify/_tmp/
+verify/_workflow/
+verify/_guismoke/
+verify/_recognition/
+verify/_zipcheck/
+
+# ---- 日志与本地诊断输出 ----
+*.log
+diagnostics*.json
+
+# ---- 编辑器 / 系统 ----
+.idea/
+.vscode/
+Thumbs.db
+desktop.ini

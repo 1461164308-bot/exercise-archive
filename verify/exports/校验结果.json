@@ -1,0 +1,116 @@
+{
+ "generated_at": "2026-09-18 19:38:27",
+ "browser": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+ "formats": {
+  "txt": "纯文本 (.txt)",
+  "md": "Markdown (.md)",
+  "html": "网页 (.html)",
+  "docx": "Word 文档 (.docx)",
+  "pdf": "PDF 文档 (.pdf)"
+ },
+ "files": [
+  {
+   "name": "错题本.txt",
+   "size": 2964,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "错题本.md",
+   "size": 2806,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "错题本.html",
+   "size": 184521,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "错题本.docx",
+   "size": 122095,
+   "ok": true,
+   "note": "（含 37 个部件，document.xml 28862 字符）"
+  },
+  {
+   "name": "错题本.pdf",
+   "size": 237028,
+   "ok": true,
+   "note": "（5 页，结束标记 有，滤镜 DCTDecode/FlateDecode）"
+  },
+  {
+   "name": "个人错题本_预置.docx",
+   "size": 68029,
+   "ok": true,
+   "note": "（含 25 个部件，document.xml 18281 字符）"
+  },
+  {
+   "name": "知识点薄弱清单.md",
+   "size": 555,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "错题汇总.md",
+   "size": 516,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "错题汇总.html",
+   "size": 1703,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "TXT 里没有残留 LaTeX 命令",
+   "size": 0,
+   "ok": true,
+   "note": "  知识点：行列式、对角线法则"
+  },
+  {
+   "name": "TXT 里公式已转成可读写法（× / ² / 行列式竖线）",
+   "size": 0,
+   "ok": true,
+   "note": "按对角线法则：1×5×10-2×4×10=50-80=7"
+  },
+  {
+   "name": "Markdown 同样无 LaTeX 残留",
+   "size": 0,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "HTML 内嵌公式图（29 处）",
+   "size": 0,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "HTML 公式图是 base64 PNG",
+   "size": 0,
+   "ok": true,
+   "note": "29 张"
+  },
+  {
+   "name": "Word 里公式作为图片内嵌（29 张）",
+   "size": 0,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "Word 段落里引用了公式图",
+   "size": 0,
+   "ok": true,
+   "note": "29 处"
+  },
+  {
+   "name": "Word 里没有残留 LaTeX 源码",
+   "size": 0,
+   "ok": true,
+   "note": ""
+  }
+ ],
+ "all_ok": true
+}

@@ -1,0 +1,617 @@
+{
+ "generated_at": "2026-09-18 19:38:36",
+ "mode": "hybrid",
+ "model": "qwen3-vl:4b",
+ "results": [
+  {
+   "file": "s1_math_choice.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高中数学·函数与导数（选择题）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+     "选择题",
+     "选择题",
+     "选择题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "blank"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "函数与导数",
+   "grade": "高中",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.86,
+   "elapsed": 78.42,
+   "quality": {
+    "score": 0.883,
+    "sharpness": 1340.9,
+    "brightness": 243.0,
+    "contrast": 0.218,
+    "ink": 0.0074,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "已知函数 $f(x)=2x^2-3x+1$，则 $f(2)$ 的值为（",
+     "options": [
+      "A. 1",
+      "B. 3",
+      "C. 7",
+      "D. 9"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "B",
+     "knowledge_points": [
+      "函数求值",
+      "导数"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s1_math_choice.jpg"
+    },
+    {
+     "index": 2,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "函数 $f(x)=x^3-3x^2+2$ 的极小值是（",
+     "options": [
+      "A. 2",
+      "B. 0",
+      "C. -2",
+      "D. -4"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "C",
+     "knowledge_points": [
+      "导数",
+      "函数最值"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.86,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s1_math_choice.jpg"
+    },
+    {
+     "index": 3,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "blank",
+     "stem": "若 $\\sin\\alpha=\\frac{3}{5}$，且 $\\alpha$ 是第二象限角，则 $\\cos\\alpha$ 的值是（",
+     "options": [
+      "A. $\\frac{3}{5}$",
+      "B. $-\\frac{3}{5}$",
+      "C. $\\frac{4}{5}$",
+      "D. $-\\frac{4}{5}$"
+     ],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "",
+     "knowledge_points": [
+      "三角函数",
+      "象限角"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s1_math_choice.jpg"
+    }
+   ],
+   "status_hits": 3,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "s2_math_fill.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "大学微积分（导数与积分、填空题）",
+    "grade": "大学",
+    "question_count": 3,
+    "types": [
+     "填空题",
+     "填空题",
+     "填空题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "correct",
+     "blank"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.95,
+   "elapsed": 55.55,
+   "quality": {
+    "score": 0.802,
+    "sharpness": 974.6,
+    "brightness": 243.8,
+    "contrast": 0.181,
+    "ink": 0.0048,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "1. $\\int (2x+1)dx = $",
+     "options": [],
+     "student_answer": "x^2+x+C",
+     "student_steps": "",
+     "correct_answer": "x^2+x+C",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "s2_math_fill.jpg"
+    },
+    {
+     "index": 2,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "2. $\\frac{d}{dx} [\\ln(x^2+1)] = $",
+     "options": [],
+     "student_answer": "2x/(x^2+1)",
+     "student_steps": "",
+     "correct_answer": "2x/(x^2+1)",
+     "knowledge_points": [
+      "导数"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "s2_math_fill.jpg"
+    },
+    {
+     "index": 3,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "blank",
+     "stem": "3. $\\int_0^1 e^x dx = $",
+     "options": [],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "e-1",
+     "knowledge_points": [
+      "定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "s2_math_fill.jpg"
+    }
+   ],
+   "status_hits": 3,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "s3_math_solution.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "大学线性代数（行列式、解答题）",
+    "grade": "大学",
+    "question_count": 1,
+    "types": [
+     "解答题"
+    ],
+    "expected_statuses": [
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "线性代数",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 47.64,
+   "quality": {
+    "score": 0.881,
+    "sharpness": 1261.3,
+    "brightness": 243.3,
+    "contrast": 0.208,
+    "ink": 0.0062,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "wrong",
+     "stem": "（12 分）计算下列三阶行列式 D 的值：$D=\\begin{vmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\\\ 7 & 8 & 10 \\end{vmatrix}$",
+     "options": [],
+     "student_answer": "D = 7",
+     "student_steps": "按第一行展开：$D = 1\\times(5\\times10-6\\times8) + 2\\times(4\\times10-6\\times7) - 3\\times(4\\times8-5\\times7)$ $= 1\\times2 + 2\\times(-2) - 3\\times(-3)$ $= 2 - 4 + 9 = 7$ 所以 $D = 7$",
+     "correct_answer": "-3",
+     "knowledge_points": [
+      "行列式",
+      "三阶行列式",
+      "行列式展开"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "线性代数",
+     "grade": "大学",
+     "source_image": "s3_math_solution.jpg"
+    }
+   ],
+   "status_hits": 1,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "s4_english.jpg",
+   "expect": {
+    "subject": "英语",
+    "subject_detail": "高中英语·语法与词汇（时态与非谓语）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+     "选择题",
+     "选择题",
+     "填空题"
+    ],
+    "expected_statuses": [
+     "wrong",
+     "correct",
+     "correct"
+    ]
+   },
+   "subject": "英语",
+   "subject_detail": "语法与词汇",
+   "grade": "高中",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 77.86,
+   "quality": {
+    "score": 0.882,
+    "sharpness": 1453.8,
+    "brightness": 242.5,
+    "contrast": 0.217,
+    "ink": 0.006,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "一 How long have you _ the dictionary?（批注：how long 表示一段时间，须与延续性动词连用）",
+     "options": [
+      "A. borrowed",
+      "B. lent",
+      "C. kept",
+      "D. bought"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "C. kept",
+     "knowledge_points": [
+      "延续性动词",
+      "how long 用法"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "英语",
+     "subject_detail": "语法与词汇",
+     "grade": "高中",
+     "source_image": "s4_english.jpg"
+    },
+    {
+     "index": 2,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "2. The sports meeting _ next Friday.（批注：主语与动词之间是被动关系）",
+     "options": [
+      "A. will hold",
+      "B. will be held",
+      "C. holds",
+      "D. is holding"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "B. will be held",
+     "knowledge_points": [
+      "被动语态",
+      "主谓一致"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "英语",
+     "subject_detail": "语法与词汇",
+     "grade": "高中",
+     "source_image": "s4_english.jpg"
+    },
+    {
+     "index": 3,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "blank",
+     "stem": "3. He is used to _ (get) up early in the morning.（批注：be used to 中的 to 是介词，后接动名词）",
+     "options": [
+      "getting",
+      "get",
+      "to get",
+      "got"
+     ],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "getting",
+     "knowledge_points": [
+      "be used to 用法",
+      "动名词"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "英语",
+     "subject_detail": "语法与词汇",
+     "grade": "高中",
+     "source_image": "s4_english.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "s5_physics.jpg",
+   "expect": {
+    "subject": "物理",
+    "subject_detail": "高中物理·牛顿第二定律（斜面模型计算题）",
+    "grade": "高中",
+    "question_count": 1,
+    "types": [
+     "计算题"
+    ],
+    "expected_statuses": [
+     "wrong"
+    ]
+   },
+   "subject": "物理",
+   "subject_detail": "力学",
+   "grade": "高中",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 62.55,
+   "quality": {
+    "score": 0.888,
+    "sharpness": 1764.8,
+    "brightness": 242.0,
+    "contrast": 0.253,
+    "ink": 0.0091,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "计算题",
+     "qtype": "计算题",
+     "status": "wrong",
+     "stem": "（12 分）如图，质量 $m = 2 \\, \\text{kg}$ 的物块由静止沿倾角 $\\theta = 30^\\circ$ 的固定斜面下滑，物块与斜面间的动摩擦因数 $\\mu = 0.25$，取 $g = 10 \\, \\text{m/s}^2$，$\\sin 30^\\circ = 0.5$，$\\cos 30^\\circ \\approx 0.87$。求物块下滑的加速度 $a$ 的大小（结果保留三位有效数字）。",
+     "options": [],
+     "student_answer": "2.815",
+     "student_steps": "由牛顿第二定律：$ma = mg \\sin \\theta - \\mu mg \\cos \\theta$\\n$a = g \\sin \\theta - \\mu g \\cos \\theta$\\n$= 10 \\times 0.5 - 0.25 \\times 10 \\times 0.87$\\n$= 5 - 2.175 = 2.815$\\n所以 $a \\approx 2.815$ 单位漏了",
+     "correct_answer": "2.83",
+     "knowledge_points": [
+      "牛顿第二定律",
+      "斜面受力分析",
+      "加速度计算"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "物理",
+     "subject_detail": "力学",
+     "grade": "高中",
+     "source_image": "s5_physics.jpg"
+    }
+   ],
+   "status_hits": 1,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "s6_math_tilted_blur.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高中数学·函数与导数（选择题，s1 的旋转模糊压暗带水印版本）",
+    "grade": "高中",
+    "question_count": 3,
+    "types": [
+     "选择题",
+     "选择题",
+     "选择题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "blank"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "函数与导数",
+   "grade": "高中",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.85,
+   "elapsed": 84.59,
+   "quality": {
+    "score": 0.891,
+    "sharpness": 646.2,
+    "brightness": 205.9,
+    "contrast": 0.275,
+    "ink": 0.0087,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "纠偏 +7.1°",
+    "提亮（gamma 0.61）",
+    "自动对比度拉伸",
+    "缩放至 1223×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "已知函数 $f(x)=2x^2-3x+1$，则 $f(2)$ 的值为（ ）",
+     "options": [
+      "A. 1",
+      "B. 3",
+      "C. 7",
+      "D. 9"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "B",
+     "knowledge_points": [
+      "函数求值",
+      "二次函数"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s6_math_tilted_blur.jpg"
+    },
+    {
+     "index": 2,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "函数 $f(x)=x^3-3x^2+2$ 的极小值是（ ）",
+     "options": [
+      "A. 2",
+      "B. 0",
+      "C. -2",
+      "D. -4"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "C",
+     "knowledge_points": [
+      "导数",
+      "函数极值"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s6_math_tilted_blur.jpg"
+    },
+    {
+     "index": 3,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "blank",
+     "stem": "若 $\\sin\\alpha=\\frac{3}{5}$，且 $\\alpha$ 是第二象限角，则 $\\cos\\alpha$ 的值是（ ）",
+     "options": [
+      "A. $\\frac{3}{5}$",
+      "B. $-\\frac{3}{5}$",
+      "C. $\\frac{4}{5}$",
+      "D. $-\\frac{4}{5}$"
+     ],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "",
+     "knowledge_points": [
+      "三角函数",
+      "象限角"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.9,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "函数与导数",
+     "grade": "高中",
+     "source_image": "s6_math_tilted_blur.jpg"
+    }
+   ],
+   "status_hits": 3,
+   "count_ok": true,
+   "subject_ok": true
+  }
+ ]
+}
