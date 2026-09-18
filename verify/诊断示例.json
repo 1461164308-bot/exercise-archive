@@ -1,7 +1,7 @@
 {
  "app": "AI本地错题习题归档整理工具",
  "version": "1.0.0",
- "generated_at": "2026-09-18 19:40:39",
+ "generated_at": "2026-09-18 20:19:53",
  "items": [
   {
    "name": "Python 版本",
@@ -18,7 +18,7 @@
   {
    "name": "磁盘剩余空间",
    "status": "✅",
-   "detail": "567.3 GB（数据目录：C:\\deepseek\\exercise-archive\\data）",
+   "detail": "587.5 GB（数据目录：C:\\deepseek\\exercise-archive\\data）",
    "hint": ""
   },
   {
@@ -66,7 +66,7 @@
   {
    "name": "显卡（NVIDIA）",
    "status": "⚠️",
-   "detail": "NVIDIA GeForce RTX 3070：占用 0%，显存 7804/8192 MB（空闲 0.4 GB），温度 38°C",
+   "detail": "NVIDIA GeForce RTX 3070：占用 4%，显存 6225/8192 MB（空闲 1.9 GB），温度 41°C",
    "hint": "显存/GPU 现在被别的程序占着（游戏、渲染、浏览器视频都算），识别会明显变慢甚至超时；关掉它们再试，或把「送模型最长边」调小"
   },
   {
@@ -79,6 +79,12 @@
    "name": "已安装模型",
    "status": "✅",
    "detail": "qwen3-vl:4b",
+   "hint": ""
+  },
+  {
+   "name": "模型显存占用",
+   "status": "✅",
+   "detail": "qwen3-vl:4b 已全部装进显存（3.9 GB）",
    "hint": ""
   },
   {

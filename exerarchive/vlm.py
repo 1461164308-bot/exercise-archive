@@ -230,6 +230,65 @@ def _host_port(base_url: str):
 
 
 # --------------------------------------------------------------------------- #
+# 「模型有多少真的装在显存里」
+# --------------------------------------------------------------------------- #
+# 背景（接管复核时实测）：Ollama 只在**加载模型的那一刻**决定 GPU/CPU 分层，
+# 之后即使显存空出来也**不会**重新规划。所以一旦模型是在显存紧张时加载的，
+# 它会一直以很低的 tok/s 跑下去 —— 实测同一份代码、同一张图：
+#   10% 上卡 → 6.6 tok/s（单图 78 秒） ；重新加载后 100% 上卡 → 74~80 tok/s（单图 6.7 秒）。
+# 用户看到的只是"今天怎么这么慢"，完全猜不到原因，所以这里把比例算出来、说清楚、给按钮。
+SLOW_TOK_PER_SEC = 15.0     # 低于这个速度就怀疑没装进显存（本机满速约 75 tok/s）
+OFFLOAD_OK = 0.90           # ≥90% 上卡视为正常
+OFFLOAD_PARTIAL = 0.50      # 50%~90% 视为部分上卡（会明显变慢）
+_SLOW_WARNED = False        # 「识别偏慢」提示每次运行只说一次
+
+
+def _mb(n: int) -> str:
+    return f"{n / 1024 / 1024 / 1024:.1f} GB" if n >= 1024 ** 3 else f"{n / 1024 / 1024:.0f} MB"
+
+
+def _classify_resident(payload: dict, model: str = "") -> dict:
+    """把 Ollama ``/api/ps`` 的原始返回，整理成「模型有多少装在显存里」的结论。
+
+    纯函数（不碰网络），方便单测。返回的 ``level`` 取值：
+    ``ok``（正常）/ ``partial``（部分上卡，会变慢）/ ``bad``（大部分在 CPU，慢一个数量级）/
+    ``not_loaded``（模型当前没驻留，按需加载，不算问题）。
+    """
+    models = (payload or {}).get("models") or []
+    pick = None
+    if model:
+        for m in models:
+            if str(m.get("name") or m.get("model") or "") == model:
+                pick = m
+                break
+    if pick is None and models:
+        pick = models[0]
+    if pick is None:
+        return {"found": False, "model": model, "size": 0, "size_vram": 0, "ratio": 0.0,
+                "level": "not_loaded", "text": "模型当前没有驻留（下次识别时会自动加载）", "hint": ""}
+
+    size = int(pick.get("size") or 0)
+    vram = int(pick.get("size_vram") or 0)
+    ratio = (vram / size) if size > 0 else 0.0
+    name = str(pick.get("name") or pick.get("model") or model)
+    if ratio >= OFFLOAD_OK:
+        level, text, hint = "ok", f"{name} 已全部装进显存（{_mb(size)}）", ""
+    elif ratio >= OFFLOAD_PARTIAL:
+        level = "partial"
+        text = f"{name} 只有 {ratio * 100:.0f}% 装在显存里（{_mb(vram)} / {_mb(size)}），识别会明显变慢"
+        hint = ("在「设置 → 本地模型」点「重新加载模型」，让 Ollama 按当前空闲显存重新规划；"
+                "若仍偏低，先关掉占显存的程序（游戏、浏览器视频、LM Studio）再重载")
+    else:
+        level = "bad"
+        text = (f"{name} 只有 {ratio * 100:.0f}% 装在显存里（{_mb(vram)} / {_mb(size)}），"
+                f"识别会慢一个数量级")
+        hint = ("在「设置 → 本地模型」点「重新加载模型」（实测 6.6 tok/s → 74~80 tok/s）；"
+                "或先关掉占显存的程序再重载；显存实在不够就调小「送模型最长边」或换更小的模型")
+    return {"found": True, "model": name, "size": size, "size_vram": vram,
+            "ratio": ratio, "level": level, "text": text, "hint": hint}
+
+
+# --------------------------------------------------------------------------- #
 # 本地模型服务管理
 # --------------------------------------------------------------------------- #
 class LocalServerManager:
@@ -366,6 +425,115 @@ class LocalServerManager:
     def model_loaded(self) -> bool:
         return bool(self.list_models())
 
+    # -- 显存占用（模型有多少真的装在显卡上）------------------------------- #
+    def resident_models(self) -> dict:
+        """查询当前**驻留**（已加载进内存/显存）的模型。
+
+        只有 Ollama 有 ``/api/ps`` 这个接口；LM Studio / 其它 OpenAI 兼容服务没有等价能力，
+        此时返回 ``supported=False``，调用方据此跳过该项检查而不是报错。
+        """
+        kind = str(self.cfg.get("local.kind", "ollama")).lower()
+        if kind != "ollama":
+            return {"supported": False, "models": [],
+                    "error": f"当前本地后端（{kind}）没有显存占用查询接口"}
+        origin, _ = _split_base(str(self.cfg.get("local.base_url", "")))
+        try:
+            data = _get_json(f"{origin}/api/ps", 6)
+        except Exception as exc:
+            return {"supported": True, "models": [], "error": f"{type(exc).__name__}: {exc}"}
+        return {"supported": True, "models": data.get("models") or [], "error": ""}
+
+    def offload_status(self, model: str = "") -> dict:
+        """当前模型「有多少真的装在显存里」的结论（自检 / 界面 / 识别日志共用）。"""
+        model = model or str(self.cfg.get("local.model", "") or "")
+        info = self.resident_models()
+        base = {"supported": bool(info["supported"]), "found": False, "model": model,
+                "size": 0, "size_vram": 0, "ratio": 0.0, "level": "unknown", "text": "", "hint": ""}
+        if not info["supported"]:
+            base.update(level="unsupported", text=info["error"])
+            return base
+        if info["error"]:
+            base.update(level="unknown", text=f"显存占用查询失败：{info['error']}")
+            return base
+        st = _classify_resident({"models": info["models"]}, model)
+        st["supported"] = True
+        return st
+
+    def reload_model(self, on_log: Optional[Callable[[str], None]] = None) -> dict:
+        """卸载再重新加载当前模型，让 Ollama 按**当前空闲显存**重新规划分层。
+
+        为什么需要这一下：Ollama 只在加载那一刻决定 GPU/CPU 分层，之后不会因为显存变空
+        而重新规划。实测同一份代码、同一张图：10% 上卡 6.6 tok/s，重载后 74~80 tok/s。
+
+        返回 ``{"ok", "before", "after", "message"}``（界面直接显示 ``message``）。
+        """
+        say = on_log or (lambda m: log.info("%s", m))
+        kind = str(self.cfg.get("local.kind", "ollama")).lower()
+        if kind != "ollama":
+            return {"ok": False, "before": {}, "after": {},
+                    "message": f"当前本地后端是 {kind}，没有「重新加载模型」接口："
+                               f"请在 LM Studio 里手动卸载并重新加载模型"}
+        model = str(self.cfg.get("local.model", "") or "").strip()
+        if not model:
+            return {"ok": False, "before": {}, "after": {},
+                    "message": "还没配置本地模型名，先在「模型名称」里选一个"}
+        if not self.ensure_running(on_log=say):
+            return {"ok": False, "before": {}, "after": {},
+                    "message": "本地模型服务不可用，先启动 Ollama 再试"}
+
+        before = self.offload_status(model)
+        origin, _ = _split_base(str(self.cfg.get("local.base_url", "")))
+        timeout = float(self.cfg.get("local.timeout", 300) or 300)
+
+        # ① 卸载：keep_alive=0 让 Ollama 立刻把模型移出显存/内存
+        unload_ok = True
+        try:
+            _post_json(f"{origin}/api/generate", {"model": model, "keep_alive": 0}, 30)
+        except Exception as exc:
+            unload_ok = False
+            say(f"卸载请求失败（仍继续尝试重新加载）：{exc}")
+        # 必须**等到真的卸载干净**再加载：否则 Ollama 会直接复用原来那个
+        # 已经定好分层的 runner，重载就白做了。
+        # 卸载请求本身就失败时只短暂等一下 —— 那种情况下模型多半还在，久等没意义。
+        self._wait_unloaded(model, timeout=20.0 if unload_ok else 3.0)
+
+        # ② 重新加载：空跑一次（只要 1 个 token），让 Ollama 按现在的空闲显存重新规划
+        say("正在按当前空闲显存重新加载模型…")
+        try:
+            _post_json(f"{origin}/api/generate",
+                       {"model": model, "prompt": "ok", "stream": False,
+                        "options": {"num_predict": 1,
+                                    "num_ctx": int(self.cfg.get("local.num_ctx", 8192))},
+                        "keep_alive": str(self.cfg.get("local.keep_alive", "10m"))},
+                       timeout)
+        except Exception as exc:
+            return {"ok": False, "before": before, "after": {},
+                    "message": f"重新加载失败：{type(exc).__name__}: {exc}"}
+
+        after = self.offload_status(model)
+        r0, r1 = float(before.get("ratio") or 0), float(after.get("ratio") or 0)
+        if after.get("level") == "ok":
+            msg = f"模型已重新加载并全部装进显存（{_mb(int(after.get('size') or 0))}），识别速度应恢复正常"
+        elif r1 > r0 + 0.05:
+            msg = (f"已重新加载，上卡比例 {r0 * 100:.0f}% → {r1 * 100:.0f}%；"
+                   f"显存仍不够，关掉占显存的程序后再点一次")
+        else:
+            msg = (f"重新加载后仍是 {r1 * 100:.0f}% —— 当前空闲显存确实装不下这个模型："
+                   f"关掉占显存的程序，或把「送模型最长边」调小、换更小的模型")
+        say(msg)
+        return {"ok": after.get("level") == "ok", "before": before, "after": after, "message": msg}
+
+    def _wait_unloaded(self, model: str, timeout: float = 20.0) -> bool:
+        """等模型真的从驻留列表里消失（重载前必须的一步，见 reload_model 的说明）。"""
+        deadline = time.time() + max(1.0, timeout)
+        while time.time() < deadline:
+            info = self.resident_models()
+            names = [str(m.get("name") or m.get("model") or "") for m in info.get("models") or []]
+            if not info.get("error") and model not in names:
+                return True
+            time.sleep(0.5)
+        return False
+
 
 # --------------------------------------------------------------------------- #
 # 统一客户端
@@ -456,6 +624,8 @@ class ModelClient:
             res.engine = engine
             res.elapsed = time.time() - t0
             res.used_images = len(payload_images)
+            if self.target == "local":
+                self._maybe_warn_slow(res, say)
             return res
         except urllib.error.HTTPError as exc:
             detail = ""
@@ -470,6 +640,32 @@ class ModelClient:
             log.warning("模型调用异常（%s）：%s", engine, exc)
             return ChatResult(engine=engine, ok=False, error=f"{type(exc).__name__}: {exc}",
                               elapsed=time.time() - t0)
+
+    # -- 慢速自诊断 -------------------------------------------------------- #
+    def _maybe_warn_slow(self, res: ChatResult, say: Callable[[str], None]) -> None:
+        """识别明显偏慢时，查一下模型是不是只有一部分装在显存里，并给出可操作的建议。
+
+        为什么要做：Ollama 只在加载那一刻决定分层，之后不会重新规划 —— 用户看到
+        "今天怎么这么慢"，实际原因（10% 上卡）在界面上完全看不出来。这里把它变成一条日志。
+
+        两个条件同时满足才提示：**速度低于阈值** 且 **上卡比例确实偏低**。
+        所以本来就慢但模型已全部上卡的机器不会被误报；每次运行只提示一次，不刷屏。
+        """
+        global _SLOW_WARNED
+        if _SLOW_WARNED or not res.ok or res.tokens_per_sec <= 0:
+            return
+        if res.tokens_per_sec >= SLOW_TOK_PER_SEC:
+            return
+        try:
+            st = self.manager.offload_status()
+        except Exception:
+            return
+        if not st.get("found") or st.get("level") not in ("bad", "partial"):
+            return
+        _SLOW_WARNED = True
+        say(f"识别偏慢（{res.tokens_per_sec:.1f} tok/s）：{st['text']}")
+        if st.get("hint"):
+            say(f"　↳ 建议：{st['hint']}")
 
     # -- 图片编码 ---------------------------------------------------------- #
     def _encode_images(self, images: List, s: Dict, say: Callable[[str], None]) -> List[str]:

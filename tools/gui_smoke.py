@@ -295,16 +295,52 @@ def main() -> int:
             print("3) 逐页切换并截图…")
             tour()
 
+    # 设置对话框也要能打开：它是唯一改配置的入口，控件写错在这里就会炸。
+    # （本地模型页新增了「重新加载模型」按钮 —— 识别变慢的修复入口，必须守住）
+    print("4) 打开设置对话框，检查本地模型页的控件…")
+    settings_ok = True
+    try:
+        from exerarchive.ui.settingsdlg import SettingsDialog
+
+        dlg = SettingsDialog(app, app.cfg)
+        app.update()
+        labels: list = []
+
+        def walk(w):
+            for child in w.winfo_children():
+                try:
+                    txt = child.cget("text")
+                except Exception:
+                    txt = ""
+                if txt:
+                    labels.append(str(txt))
+                walk(child)
+
+        walk(dlg)
+        need = ["重新加载模型", "刷新模型列表", "测试连接"]
+        missing = [t for t in need if t not in labels]
+        if missing:
+            print(f"   ❌ 设置对话框缺少控件：{missing}")
+            settings_ok = False
+        else:
+            print(f"   ✓ 设置对话框构建正常（{len(labels)} 个文本控件，含「重新加载模型」）")
+        dlg.destroy()
+        app.update()
+    except Exception as exc:
+        print(f"   ❌ 设置对话框打开失败：{type(exc).__name__}: {exc}")
+        settings_ok = False
+
     if args.keep:
         print("窗口保留中，关闭窗口即可退出（Ctrl+C 也可）")
         app.mainloop()
     else:
         app._on_close()
-    print(f"GUI 冒烟测试通过 ✅（截图 {len(shots)} 张，位于 {out_dir}）")
+    if settings_ok:
+        print(f"GUI 冒烟测试通过 ✅（截图 {len(shots)} 张，位于 {out_dir}）")
     # 给批处理用的纯 ASCII 结果行（findstr 对 emoji 不友好）
-    print(f"RESULT: OK ({len(tabs)} tabs, {len(shots)} screenshots)")
-    return 0
-
+    print(f"RESULT: {'OK' if settings_ok else 'FAILED'} "
+          f"({len(tabs)} tabs, {len(shots)} screenshots)")
+    return 0 if settings_ok else 1
 
 if __name__ == "__main__":
     raise SystemExit(main())

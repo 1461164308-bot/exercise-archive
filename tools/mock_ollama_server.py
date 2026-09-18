@@ -63,8 +63,16 @@ class _Handler(BaseHTTPRequestHandler):
                  "capabilities": ["completion"]},
             ]})
         elif self.path.endswith("/api/ps"):
-            self._json(200, {"models": [{"name": srv.model, "size": 3295636135,
-                                         "size_vram": 3295636135}]})
+            # 驻留状态可被测试改：resident=False 表示模型已卸载；
+            # size_vram_ratio 用来模拟「只有一部分装在显存里」的慢档（Ollama 的真实行为）
+            if not srv.resident:
+                self._json(200, {"models": []})
+            else:
+                size = 3295636135
+                self._json(200, {"models": [{
+                    "name": srv.model, "size": size,
+                    "size_vram": int(size * float(srv.size_vram_ratio)),
+                }]})
         elif self.path.endswith("/api/show"):
             self._json(200, {"details": {"family": "qwen3vl", "parameter_size": "4.4B",
                                          "quantization_level": "Q4_K_M"},
@@ -87,6 +95,24 @@ class _Handler(BaseHTTPRequestHandler):
         if srv.fail_times > 0:
             srv.fail_times -= 1
             self._json(500, {"error": "mock internal error"})
+            return
+
+        # /api/generate：本项目只用它做「卸载（keep_alive=0）」与「重新加载（空跑一次）」。
+        # 这里忠实模拟真实 Ollama 的两条关键行为：
+        #   ① keep_alive=0 → 模型被移出显存（/api/ps 变空）
+        #   ② 重新加载时按**当前**空闲显存决定分层 → 用 load_ratio 表示
+        if self.path.endswith("/api/generate"):
+            if body.get("keep_alive") == 0 or body.get("keep_alive") == "0":
+                srv.resident = False
+                self._json(200, {"model": body.get("model", srv.model), "done": True,
+                                 "done_reason": "unload", "response": ""})
+                return
+            srv.resident = True
+            srv.size_vram_ratio = float(srv.load_ratio)     # 加载那一刻决定分层
+            srv.load_count += 1
+            self._json(200, {"model": body.get("model", srv.model), "done": True,
+                             "done_reason": "stop", "response": "ok",
+                             "prompt_eval_count": 1, "eval_count": 1})
             return
 
         text = json.dumps(srv.recognize if srv.recognize else DEFAULT_RECOGNIZE, ensure_ascii=False)
@@ -124,6 +150,11 @@ class MockOllamaServer(ThreadingHTTPServer):
         self.fail_times = 0
         self.empty_content = False       # 答案只出现在 thinking 字段
         self.plain_text = False          # 先返回非 JSON（触发重试）
+        # 显存分层模拟（对应真实 Ollama 的 /api/ps 与加载行为）
+        self.resident = True             # 模型当前是否驻留
+        self.size_vram_ratio = 1.0       # 当前有多少装在显存里（1.0 = 全部）
+        self.load_ratio = 1.0            # 「下一次加载」时会得到多少上卡比例
+        self.load_count = 0              # 被加载了几次（用来断言重载真的发生了）
 
 
 class MockOllama:
@@ -189,6 +220,41 @@ class MockOllama:
     @plain_text.setter
     def plain_text(self, value: bool) -> None:
         self._server.plain_text = bool(value)
+
+    # -- 显存分层模拟 ------------------------------------------------------ #
+    @property
+    def resident(self) -> bool:
+        return self._server.resident
+
+    @resident.setter
+    def resident(self, value: bool) -> None:
+        self._server.resident = bool(value)
+
+    @property
+    def size_vram_ratio(self) -> float:
+        return self._server.size_vram_ratio
+
+    @size_vram_ratio.setter
+    def size_vram_ratio(self, value: float) -> None:
+        self._server.size_vram_ratio = float(value)
+
+    @property
+    def load_ratio(self) -> float:
+        """模拟「下次加载时会拿到多少上卡比例」——显存紧张时真实 Ollama 就是这个行为。"""
+        return self._server.load_ratio
+
+    @load_ratio.setter
+    def load_ratio(self, value: float) -> None:
+        self._server.load_ratio = float(value)
+
+    @property
+    def load_count(self) -> int:
+        return self._server.load_count
+
+    def generate_calls(self) -> list:
+        """所有打到 /api/generate 的请求（卸载与重载都走它）。"""
+        return [r for r in self.requests
+                if r.get("method") == "POST" and str(r.get("path", "")).endswith("/api/generate")]
 
     def last_post(self) -> dict:
         for req in reversed(self.requests):

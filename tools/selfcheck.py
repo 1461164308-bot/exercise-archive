@@ -228,9 +228,16 @@ def check_local_model(rep: Report, cfg, deep: bool = True):
     elif alive:
         rep.add("已安装模型", BAD, "本地服务在跑，但没有任何模型",
                 "执行：ollama pull qwen3-vl:4b（或 lms load qwen3-vl-4b-instruct）")
-    if not deep or not alive:
-        return
-    # 视觉能力实测：造一张写着固定字符串的图，看模型能不能读出来
+    if deep and alive:
+        check_vision(rep, client)
+    # 模型「有多少真的装在显存里」：Ollama 只在加载那一刻分层，比例偏低会一直慢。
+    # 放在最后查：加了 --no-model 时若模型已经驻留，这个结论同样有参考价值。
+    if alive:
+        check_offload(rep, client)
+
+
+def check_vision(rep: Report, client) -> None:
+    """视觉能力实测：造一张写着固定字符串的图，看模型能不能读出来。"""
     try:
         from exerarchive import imageops as _io
 
@@ -252,6 +259,22 @@ def check_local_model(rep: Report, cfg, deep: bool = True):
                                "或在设置里调大 max_image_side")
     except Exception as exc:
         rep.add("本地模型视觉实测", WARN, f"{exc}")
+
+
+def check_offload(rep: Report, client) -> None:
+    """模型有多少真的装在显存里（识别"突然变慢"的头号原因，见 docs/03 附录二）。
+
+    只在模型**当前驻留**时报告：没驻留是按需加载的正常状态，不该多一项、更不该报警。
+    """
+    try:
+        st = client.manager.offload_status()
+    except Exception:
+        return
+    if not st.get("found"):
+        return
+    level = st.get("level")
+    rep.add("模型显存占用", OK if level == "ok" else WARN, st.get("text", ""),
+            "" if level == "ok" else st.get("hint", ""))
 
 
 def check_cloud(rep: Report, cfg):

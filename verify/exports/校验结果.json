@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-18 19:38:27",
+ "generated_at": "2026-09-18 20:17:26",
  "browser": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
  "formats": {
   "txt": "纯文本 (.txt)",
@@ -29,9 +29,9 @@
   },
   {
    "name": "错题本.docx",
-   "size": 122095,
+   "size": 122088,
    "ok": true,
-   "note": "（含 37 个部件，document.xml 28862 字符）"
+   "note": "（含 37 个部件，document.xml 28858 字符）"
   },
   {
    "name": "错题本.pdf",
@@ -41,7 +41,7 @@
   },
   {
    "name": "个人错题本_预置.docx",
-   "size": 68029,
+   "size": 68027,
    "ok": true,
    "note": "（含 25 个部件，document.xml 18281 字符）"
   },

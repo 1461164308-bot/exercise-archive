@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-18 19:54:57",
+ "generated_at": "2026-09-18 20:20:33",
  "mode": "hybrid",
  "model": "qwen3-vl:4b",
  "results": [
@@ -27,7 +27,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.86,
-   "elapsed": 7.28,
+   "elapsed": 6.3,
    "quality": {
     "score": 0.883,
     "sharpness": 1340.9,
@@ -47,7 +47,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "correct",
-     "stem": "已知函数 $f(x)=2x^2-3x+1$，则 $f(2)$ 的值为（",
+     "stem": "已知函数 $f(x)=2x^2-3x+1$，则 $f(2)$ 的值为（ ）",
      "options": [
       "A. 1",
       "B. 3",
@@ -73,7 +73,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "wrong",
-     "stem": "函数 $f(x)=x^3-3x^2+2$ 的极小值是（",
+     "stem": "函数 $f(x)=x^3-3x^2+2$ 的极小值是（ ）",
      "options": [
       "A. 2",
       "B. 0",
@@ -100,7 +100,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "blank",
-     "stem": "若 $\\sin\\alpha=\\frac{3}{5}$，且 $\\alpha$ 是第二象限角，则 $\\cos\\alpha$ 的值是（",
+     "stem": "若 $\\sin\\alpha=\\frac{3}{5}$，且 $\\alpha$ 是第二象限角，则 $\\cos\\alpha$ 的值是（ ）",
      "options": [
       "A. $\\frac{3}{5}$",
       "B. $-\\frac{3}{5}$",
@@ -115,7 +115,7 @@
       "象限角"
      ],
      "difficulty": "中等",
-     "confidence": 0.98,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "函数与导数",
@@ -151,7 +151,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.95,
-   "elapsed": 6.7,
+   "elapsed": 5.65,
    "quality": {
     "score": 0.802,
     "sharpness": 974.6,
@@ -171,7 +171,7 @@
      "type": "填空题",
      "qtype": "填空题",
      "status": "correct",
-     "stem": "1. $\\int (2x+1)dx = $",
+     "stem": "1. $\\int(2x+1)dx=$",
      "options": [],
      "student_answer": "x^2+x+C",
      "student_steps": "",
@@ -181,7 +181,7 @@
       "基本积分公式"
      ],
      "difficulty": "简单",
-     "confidence": 0.98,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "高等数学",
@@ -193,14 +193,14 @@
      "type": "填空题",
      "qtype": "填空题",
      "status": "correct",
-     "stem": "2. $\\frac{d}{dx} [\\ln(x^2+1)] = $",
+     "stem": "2. $\\frac{d}{dx}[\\ln(x^2+1)]= $",
      "options": [],
      "student_answer": "2x/(x^2+1)",
      "student_steps": "",
      "correct_answer": "2x/(x^2+1)",
      "knowledge_points": [
       "导数",
-      "复合函数求导"
+      "链式法则"
      ],
      "difficulty": "中等",
      "confidence": 0.95,
@@ -215,7 +215,7 @@
      "type": "填空题",
      "qtype": "填空题",
      "status": "blank",
-     "stem": "3. $\\int_0^1 e^x dx = $",
+     "stem": "3. $\\int_0^1 e^x dx=$",
      "options": [],
      "student_answer": "",
      "student_steps": "",
@@ -225,7 +225,7 @@
       "基本积分公式"
      ],
      "difficulty": "简单",
-     "confidence": 0.99,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "高等数学",
@@ -256,8 +256,8 @@
    "grade": "大学",
    "engine": "local:qwen3-vl:4b",
    "route": "local",
-   "confidence": 0.95,
-   "elapsed": 6.36,
+   "confidence": 0.92,
+   "elapsed": 5.78,
    "quality": {
     "score": 0.881,
     "sharpness": 1261.3,
@@ -281,14 +281,14 @@
      "options": [],
      "student_answer": "D = 7",
      "student_steps": "按第一行展开：$D = 1\\times(5\\times10-6\\times8) + 2\\times(4\\times10-6\\times7) - 3\\times(4\\times8-5\\times7)$ $= 1\\times2 + 2\\times(-2) - 3\\times(-3)$ $= 2 - 4 + 9 = 7$ 所以 $D = 7$",
-     "correct_answer": "D = -3",
+     "correct_answer": "-3",
      "knowledge_points": [
       "行列式",
       "三阶行列式",
-      "按行展开"
+      "行列式展开"
      ],
      "difficulty": "中等",
-     "confidence": 0.95,
+     "confidence": 0.92,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "线性代数",
@@ -324,7 +324,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.95,
-   "elapsed": 7.75,
+   "elapsed": 6.96,
    "quality": {
     "score": 0.882,
     "sharpness": 1453.8,
@@ -344,7 +344,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "wrong",
-     "stem": "一 How long have you _ the dictionary? ( B )",
+     "stem": "How long have you _ the dictionary?",
      "options": [
       "A. borrowed",
       "B. lent",
@@ -371,7 +371,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "correct",
-     "stem": "2. The sports meeting _ next Friday. ( B )",
+     "stem": "The sports meeting _ next Friday.",
      "options": [
       "A. will hold",
       "B. will be held",
@@ -398,7 +398,7 @@
      "type": "填空题",
      "qtype": "填空题",
      "status": "correct",
-     "stem": "3. He is used to _ (get) up early in the morning.",
+     "stem": "He is used to _ (get) up early in the morning.",
      "options": [
       "getting"
      ],
@@ -406,8 +406,7 @@
      "student_steps": "",
      "correct_answer": "getting",
      "knowledge_points": [
-      "be used to 用法",
-      "动名词"
+      "be used to 用法"
      ],
      "difficulty": "中等",
      "confidence": 0.95,
@@ -441,8 +440,8 @@
    "grade": "高中",
    "engine": "local:qwen3-vl:4b",
    "route": "local",
-   "confidence": 0.92,
-   "elapsed": 6.6,
+   "confidence": 0.95,
+   "elapsed": 7.14,
    "quality": {
     "score": 0.888,
     "sharpness": 1764.8,
@@ -465,15 +464,14 @@
      "stem": "（12 分）如图，质量 $m = 2 \\, \\text{kg}$ 的物块由静止沿倾角 $\\theta = 30^\\circ$ 的固定斜面下滑，物块与斜面间的动摩擦因数 $\\mu = 0.25$，取 $g = 10 \\, \\text{m/s}^2$，$\\sin 30^\\circ = 0.5$，$\\cos 30^\\circ \\approx 0.87$。求物块下滑的加速度 $a$ 的大小（结果保留三位有效数字）。",
      "options": [],
      "student_answer": "2.815",
-     "student_steps": "由牛顿第二定律：$ma = mg \\sin \\theta - \\mu mg \\cos \\theta$ \n$a = g \\sin \\theta - \\mu g \\cos \\theta$ \n$= 10 \\times 0.5 - 0.25 \\times 10 \\times 0.87$ \n$= 5 - 2.175 = 2.815$ \n所以 $a \\approx 2.815$ 单位漏了",
+     "student_steps": "由牛顿第二定律：$ma = mg \\sin \\theta - \\mu mg \\cos \\theta$\\n$a = g \\sin \\theta - \\mu g \\cos \\theta$\\n$= 10 \\times 0.5 - 0.25 \\times 10 \\times 0.87$\\n$= 5 - 2.175 = 2.815$\\n所以 $a \\approx 2.815$ 单位漏了",
      "correct_answer": "2.83",
      "knowledge_points": [
       "牛顿第二定律",
-      "斜面受力分析",
-      "加速度计算"
+      "斜面受力分析"
      ],
      "difficulty": "中等",
-     "confidence": 0.92,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "物理",
      "subject_detail": "力学",
@@ -508,8 +506,8 @@
    "grade": "高中",
    "engine": "local:qwen3-vl:4b",
    "route": "local",
-   "confidence": 0.85,
-   "elapsed": 8.49,
+   "confidence": 0.75,
+   "elapsed": 8.3,
    "quality": {
     "score": 0.891,
     "sharpness": 646.2,
@@ -600,7 +598,7 @@
       "象限角"
      ],
      "difficulty": "中等",
-     "confidence": 0.85,
+     "confidence": 0.75,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "函数与导数",

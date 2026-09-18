@@ -116,6 +116,13 @@ class SettingsDialog(tk.Toplevel):
         self.model_hint = ttk.Label(tab, text="　　（点「刷新模型列表」可从本机服务读取已安装模型）",
                                     style="Muted.TLabel")
         self.model_hint.pack(anchor="w", pady=(0, 4))
+        # 识别"突然变慢"的头号原因是模型没装进显存：Ollama 只在加载那一刻分层，之后不再规划。
+        # 所以给一个按钮，让它按当前空闲显存重新加载一次（实测 6.6 tok/s → 74~80 tok/s）。
+        r = ttk.Frame(tab)
+        r.pack(fill="x", pady=(0, 6))
+        ttk.Button(r, text="重新加载模型", command=self.reload_local_model).pack(side="left")
+        ttk.Label(r, text="　识别明显变慢时点这个：让 Ollama 按当前空闲显存重新规划（几十秒）",
+                  style="Muted.TLabel").pack(side="left")
         self._row(tab, "识别超时(秒)", "local.timeout", "CPU 跑视觉模型可能较慢，默认 300 秒")
         self._row(tab, "送模型最长边", "local.max_image_side",
                   "越小越快、越省显存（默认 1600；显存紧张可调到 1100）")
@@ -289,7 +296,7 @@ class SettingsDialog(tk.Toplevel):
 
     # ------------------------------------------------------------------ #
     def refresh_models(self) -> None:
-        """从本地服务读取已安装模型，填进下拉框。"""
+        """从本地服务读取已安装模型，填进下拉框（顺便报一下模型有多少装在显存里）。"""
         self.apply_profile_fields()
         self.cfg.update(self._collect())
         client = ModelClient("local", self.cfg)
@@ -300,18 +307,51 @@ class SettingsDialog(tk.Toplevel):
             except Exception as exc:
                 models = []
                 log.warning("读取模型列表失败：%s", exc)
-            self.after(0, lambda: self._set_models(models))
+            status = ""
+            try:
+                st = client.manager.offload_status()
+                if st.get("found"):
+                    status = ("⚠️ " if st.get("level") in ("bad", "partial") else "") + st.get("text", "")
+            except Exception:
+                status = ""
+            self.after(0, lambda: self._set_models(models, status))
 
         self.model_hint.configure(text="　　正在读取模型列表…")
         threading.Thread(target=work, daemon=True).start()
 
-    def _set_models(self, models) -> None:
+    def _set_models(self, models, status: str = "") -> None:
         if models:
             self.model_box.configure(values=models)
-            self.model_hint.configure(text=f"　　发现 {len(models)} 个模型：{'、'.join(models[:6])}")
+            text = f"　　发现 {len(models)} 个模型：{'、'.join(models[:6])}"
         else:
-            self.model_hint.configure(text="　　没读到模型：请确认本地服务在运行"
-                                           "（ollama serve），并且已经 ollama pull 过视觉模型")
+            text = ("　　没读到模型：请确认本地服务在运行"
+                    "（ollama serve），并且已经 ollama pull 过视觉模型")
+        if status:
+            text += f"\n　　{status}"
+        self.model_hint.configure(text=text)
+
+    def reload_local_model(self) -> None:
+        """卸载再重新加载本地模型，让 Ollama 按当前空闲显存重新规划分层。
+
+        对应「识别突然变慢」这个坑：Ollama 只在加载那一刻决定 GPU/CPU 分层，之后即使显存
+        空出来也不会重新规划，于是慢档会一直持续。实测重载后 6.6 tok/s → 74~80 tok/s。
+        """
+        self.apply_profile_fields()
+        self.cfg.update(self._collect())
+        client = ModelClient("local", self.cfg)
+        self.model_hint.configure(text="　　正在重新加载模型（可能要几十秒，请稍候）…")
+
+        def work():
+            try:
+                res = client.manager.reload_model()
+                msg = "　　" + str(res.get("message", ""))
+                if not res.get("ok"):
+                    msg = "⚠️ " + msg.lstrip()
+            except Exception as exc:
+                msg = f"　　重新加载失败 ❌：{exc}"
+            self.after(0, lambda: self.model_hint.configure(text=msg))
+
+        threading.Thread(target=work, daemon=True).start()
 
     def test_local(self) -> None:
         self.apply_profile_fields()
