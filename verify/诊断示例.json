@@ -1,7 +1,7 @@
 {
  "app": "AI本地错题习题归档整理工具",
  "version": "1.0.0",
- "generated_at": "2026-09-17 22:19:47",
+ "generated_at": "2026-09-18 19:40:39",
  "items": [
   {
    "name": "Python 版本",
@@ -18,7 +18,7 @@
   {
    "name": "磁盘剩余空间",
    "status": "✅",
-   "detail": "599.6 GB（数据目录：C:\\deepseek\\exercise-archive\\data）",
+   "detail": "567.3 GB（数据目录：C:\\deepseek\\exercise-archive\\data）",
    "hint": ""
   },
   {
@@ -58,16 +58,28 @@
    "hint": ""
   },
   {
+   "name": "公式排版（数学渲染）",
+   "status": "✅",
+   "detail": "分式/根号/上下标/矩阵 4 类样例均正常（字号 20px）",
+   "hint": ""
+  },
+  {
    "name": "显卡（NVIDIA）",
    "status": "⚠️",
-   "detail": "NVIDIA GeForce RTX 3070：占用 88%，显存 4901/8192 MB（空闲 3.2 GB），温度 74°C",
+   "detail": "NVIDIA GeForce RTX 3070：占用 0%，显存 7804/8192 MB（空闲 0.4 GB），温度 38°C",
    "hint": "显存/GPU 现在被别的程序占着（游戏、渲染、浏览器视频都算），识别会明显变慢甚至超时；关掉它们再试，或把「送模型最长边」调小"
   },
   {
    "name": "本地模型服务",
-   "status": "❌",
-   "detail": "未运行（ollama @ http://127.0.0.1:11434）",
-   "hint": "双击「启动.bat」后重试；或在设置里开启自动启动本地服务"
+   "status": "✅",
+   "detail": "运行中（ollama @ http://127.0.0.1:11434）",
+   "hint": ""
+  },
+  {
+   "name": "已安装模型",
+   "status": "✅",
+   "detail": "qwen3-vl:4b",
+   "hint": ""
   },
   {
    "name": "云端增强",
@@ -94,7 +106,7 @@
    "hint": ""
   }
  ],
- "failed": 1,
+ "failed": 0,
  "warned": 1,
- "ok": false
+ "ok": true
 }

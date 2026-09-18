@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-18 19:38:36",
+ "generated_at": "2026-09-18 19:54:57",
  "mode": "hybrid",
  "model": "qwen3-vl:4b",
  "results": [
@@ -27,7 +27,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.86,
-   "elapsed": 78.42,
+   "elapsed": 7.28,
    "quality": {
     "score": 0.883,
     "sharpness": 1340.9,
@@ -58,8 +58,7 @@
      "student_steps": "",
      "correct_answer": "B",
      "knowledge_points": [
-      "函数求值",
-      "导数"
+      "函数求值"
      ],
      "difficulty": "简单",
      "confidence": 0.95,
@@ -152,7 +151,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.95,
-   "elapsed": 55.55,
+   "elapsed": 6.7,
    "quality": {
     "score": 0.802,
     "sharpness": 974.6,
@@ -178,10 +177,11 @@
      "student_steps": "",
      "correct_answer": "x^2+x+C",
      "knowledge_points": [
-      "不定积分"
+      "不定积分",
+      "基本积分公式"
      ],
      "difficulty": "简单",
-     "confidence": 0.95,
+     "confidence": 0.98,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "高等数学",
@@ -199,9 +199,10 @@
      "student_steps": "",
      "correct_answer": "2x/(x^2+1)",
      "knowledge_points": [
-      "导数"
+      "导数",
+      "复合函数求导"
      ],
-     "difficulty": "简单",
+     "difficulty": "中等",
      "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
@@ -220,10 +221,11 @@
      "student_steps": "",
      "correct_answer": "e-1",
      "knowledge_points": [
-      "定积分"
+      "定积分",
+      "基本积分公式"
      ],
      "difficulty": "简单",
-     "confidence": 0.95,
+     "confidence": 0.99,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "高等数学",
@@ -254,8 +256,8 @@
    "grade": "大学",
    "engine": "local:qwen3-vl:4b",
    "route": "local",
-   "confidence": 0.92,
-   "elapsed": 47.64,
+   "confidence": 0.95,
+   "elapsed": 6.36,
    "quality": {
     "score": 0.881,
     "sharpness": 1261.3,
@@ -279,14 +281,14 @@
      "options": [],
      "student_answer": "D = 7",
      "student_steps": "按第一行展开：$D = 1\\times(5\\times10-6\\times8) + 2\\times(4\\times10-6\\times7) - 3\\times(4\\times8-5\\times7)$ $= 1\\times2 + 2\\times(-2) - 3\\times(-3)$ $= 2 - 4 + 9 = 7$ 所以 $D = 7$",
-     "correct_answer": "-3",
+     "correct_answer": "D = -3",
      "knowledge_points": [
       "行列式",
       "三阶行列式",
-      "行列式展开"
+      "按行展开"
      ],
      "difficulty": "中等",
-     "confidence": 0.92,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "线性代数",
@@ -321,8 +323,8 @@
    "grade": "高中",
    "engine": "local:qwen3-vl:4b",
    "route": "local",
-   "confidence": 0.92,
-   "elapsed": 77.86,
+   "confidence": 0.95,
+   "elapsed": 7.75,
    "quality": {
     "score": 0.882,
     "sharpness": 1453.8,
@@ -342,7 +344,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "wrong",
-     "stem": "一 How long have you _ the dictionary?（批注：how long 表示一段时间，须与延续性动词连用）",
+     "stem": "一 How long have you _ the dictionary? ( B )",
      "options": [
       "A. borrowed",
       "B. lent",
@@ -351,13 +353,13 @@
      ],
      "student_answer": "B",
      "student_steps": "",
-     "correct_answer": "C. kept",
+     "correct_answer": "B",
      "knowledge_points": [
       "延续性动词",
       "how long 用法"
      ],
      "difficulty": "中等",
-     "confidence": 0.92,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "英语",
      "subject_detail": "语法与词汇",
@@ -369,7 +371,7 @@
      "type": "选择题",
      "qtype": "选择题",
      "status": "correct",
-     "stem": "2. The sports meeting _ next Friday.（批注：主语与动词之间是被动关系）",
+     "stem": "2. The sports meeting _ next Friday. ( B )",
      "options": [
       "A. will hold",
       "B. will be held",
@@ -378,7 +380,7 @@
      ],
      "student_answer": "B",
      "student_steps": "",
-     "correct_answer": "B. will be held",
+     "correct_answer": "B",
      "knowledge_points": [
       "被动语态",
       "主谓一致"
@@ -395,15 +397,12 @@
      "index": 3,
      "type": "填空题",
      "qtype": "填空题",
-     "status": "blank",
-     "stem": "3. He is used to _ (get) up early in the morning.（批注：be used to 中的 to 是介词，后接动名词）",
+     "status": "correct",
+     "stem": "3. He is used to _ (get) up early in the morning.",
      "options": [
-      "getting",
-      "get",
-      "to get",
-      "got"
+      "getting"
      ],
-     "student_answer": "",
+     "student_answer": "getting",
      "student_steps": "",
      "correct_answer": "getting",
      "knowledge_points": [
@@ -411,7 +410,7 @@
       "动名词"
      ],
      "difficulty": "中等",
-     "confidence": 0.98,
+     "confidence": 0.95,
      "engine": "local:qwen3-vl:4b",
      "subject": "英语",
      "subject_detail": "语法与词汇",
@@ -419,7 +418,7 @@
      "source_image": "s4_english.jpg"
     }
    ],
-   "status_hits": 2,
+   "status_hits": 3,
    "count_ok": true,
    "subject_ok": true
   },
@@ -443,7 +442,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.92,
-   "elapsed": 62.55,
+   "elapsed": 6.6,
    "quality": {
     "score": 0.888,
     "sharpness": 1764.8,
@@ -466,7 +465,7 @@
      "stem": "（12 分）如图，质量 $m = 2 \\, \\text{kg}$ 的物块由静止沿倾角 $\\theta = 30^\\circ$ 的固定斜面下滑，物块与斜面间的动摩擦因数 $\\mu = 0.25$，取 $g = 10 \\, \\text{m/s}^2$，$\\sin 30^\\circ = 0.5$，$\\cos 30^\\circ \\approx 0.87$。求物块下滑的加速度 $a$ 的大小（结果保留三位有效数字）。",
      "options": [],
      "student_answer": "2.815",
-     "student_steps": "由牛顿第二定律：$ma = mg \\sin \\theta - \\mu mg \\cos \\theta$\\n$a = g \\sin \\theta - \\mu g \\cos \\theta$\\n$= 10 \\times 0.5 - 0.25 \\times 10 \\times 0.87$\\n$= 5 - 2.175 = 2.815$\\n所以 $a \\approx 2.815$ 单位漏了",
+     "student_steps": "由牛顿第二定律：$ma = mg \\sin \\theta - \\mu mg \\cos \\theta$ \n$a = g \\sin \\theta - \\mu g \\cos \\theta$ \n$= 10 \\times 0.5 - 0.25 \\times 10 \\times 0.87$ \n$= 5 - 2.175 = 2.815$ \n所以 $a \\approx 2.815$ 单位漏了",
      "correct_answer": "2.83",
      "knowledge_points": [
       "牛顿第二定律",
@@ -510,7 +509,7 @@
    "engine": "local:qwen3-vl:4b",
    "route": "local",
    "confidence": 0.85,
-   "elapsed": 84.59,
+   "elapsed": 8.49,
    "quality": {
     "score": 0.891,
     "sharpness": 646.2,
@@ -543,8 +542,8 @@
      "student_steps": "",
      "correct_answer": "B",
      "knowledge_points": [
-      "函数求值",
-      "二次函数"
+      "函数值",
+      "代入法"
      ],
      "difficulty": "简单",
      "confidence": 0.95,
@@ -571,10 +570,10 @@
      "correct_answer": "C",
      "knowledge_points": [
       "导数",
-      "函数极值"
+      "函数最值"
      ],
      "difficulty": "中等",
-     "confidence": 0.85,
+     "confidence": 0.86,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "函数与导数",
@@ -601,7 +600,7 @@
       "象限角"
      ],
      "difficulty": "中等",
-     "confidence": 0.9,
+     "confidence": 0.85,
      "engine": "local:qwen3-vl:4b",
      "subject": "数学",
      "subject_detail": "函数与导数",
