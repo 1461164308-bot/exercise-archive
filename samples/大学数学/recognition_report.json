@@ -1,0 +1,1120 @@
+{
+ "generated_at": "2026-10-16 11:06:16",
+ "mode": "hybrid",
+ "model": "qwen3-vl:4b",
+ "results": [
+  {
+   "file": "u1_math_limits_fill.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高等数学·极限与连续",
+    "grade": "大学",
+    "question_count": 6,
+    "types": [
+     "填空题",
+     "填空题",
+     "填空题",
+     "选择题",
+     "填空题",
+     "选择题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "correct",
+     "wrong",
+     "wrong",
+     "correct"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.85,
+   "elapsed": 9.56,
+   "quality": {
+    "score": 0.888,
+    "sharpness": 1902.9,
+    "brightness": 242.7,
+    "contrast": 0.255,
+    "ink": 0.011,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "求极限 $\\lim_{x\\to 0} \\frac{\\sin 3x}{x}$",
+     "options": [],
+     "student_answer": "3",
+     "student_steps": "",
+     "correct_answer": "3",
+     "knowledge_points": [
+      "极限"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    },
+    {
+     "index": 2,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "求极限 $\\lim_{x\\to \\infty} \\left(1 + \\frac{2}{x}\\right)^x$",
+     "options": [
+      "A. $e$",
+      "B. $e^2$",
+      "C. $e^3$",
+      "D. $e^4$"
+     ],
+     "student_answer": "e",
+     "student_steps": "",
+     "correct_answer": "e^2",
+     "knowledge_points": [
+      "极限"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    },
+    {
+     "index": 3,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "设 $f(x) = \\frac{x^2 - 1}{x - 1}$，则 $x = 1$ 是 $f(x)$ 的",
+     "options": [
+      "A. 可去间断点",
+      "B. 跳跃间断点",
+      "C. 无穷间断点",
+      "D. 振荡间断点"
+     ],
+     "student_answer": "可去间断点",
+     "student_steps": "",
+     "correct_answer": "可去间断点",
+     "knowledge_points": [
+      "间断点"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    },
+    {
+     "index": 4,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "当 $x \\to 0$ 时，与 $x$ 等价的无穷小是（）",
+     "options": [
+      "A. $1 - \\cos x$",
+      "B. $\\tan 2x$",
+      "C. $\\sin x$",
+      "D. $\\ln(1 + x^2)$"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "C",
+     "knowledge_points": [
+      "等价无穷小"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    },
+    {
+     "index": 5,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "wrong",
+     "stem": "设 $f(x) = x \\cdot \\sin(\\frac{1}{x})$，则 $\\lim_{x\\to 0} f(x)$ =",
+     "options": [],
+     "student_answer": "不存在",
+     "student_steps": "",
+     "correct_answer": "0",
+     "knowledge_points": [
+      "极限"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    },
+    {
+     "index": 6,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "设 $f(x) = \\ln(1 + x)$，则 $f'(0)$ =（）",
+     "options": [
+      "A. 0",
+      "B. 1",
+      "C. $\\frac{1}{2}$",
+      "D. $e$"
+     ],
+     "student_answer": "B",
+     "student_steps": "",
+     "correct_answer": "1",
+     "knowledge_points": [
+      "导数"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u1_math_limits_fill.jpg"
+    }
+   ],
+   "status_hits": 6,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u2_math_derivative_choice.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高等数学·导数与微分",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+     "选择题",
+     "选择题",
+     "选择题",
+     "填空题",
+     "选择题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "blank",
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.7,
+   "elapsed": 10.84,
+   "quality": {
+    "score": 0.887,
+    "sharpness": 1768.6,
+    "brightness": 243.1,
+    "contrast": 0.245,
+    "ink": 0.0093,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "correct",
+     "stem": "（5 分）设 $y = x^3 + \\ln x$，则 $y'$ =（ ）",
+     "options": [
+      "A. $3x^2 + \\frac{1}{x}$",
+      "B. $3x^2 + \\ln x$",
+      "C. $x^2 + \\frac{1}{x}$",
+      "D. $3x^2 - \\frac{1}{x}$"
+     ],
+     "student_answer": "A",
+     "student_steps": "",
+     "correct_answer": "A",
+     "knowledge_points": [
+      "导数",
+      "函数求导"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u2_math_derivative_choice.jpg"
+    },
+    {
+     "index": 2,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "（5 分）设 $y = \\sin(2x)$，则 $dy$ =（ ）",
+     "options": [
+      "A. $\\cos 2x \\, dx$",
+      "B. $2\\cos 2x \\, dx$",
+      "C. $-2\\cos 2x \\, dx$",
+      "D. $2\\sin 2x \\, dx$"
+     ],
+     "student_answer": "A",
+     "student_steps": "",
+     "correct_answer": "B",
+     "knowledge_points": [
+      "导数",
+      "复合函数求导"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u2_math_derivative_choice.jpg"
+    },
+    {
+     "index": 3,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "blank",
+     "stem": "（5 分）设 $y = e^x \\cdot \\arctan x$，则 $y'(0)$ =（ ）",
+     "options": [
+      "A. $0$",
+      "B. $1$",
+      "C. $\\pi/4$",
+      "D. $2$"
+     ],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "",
+     "knowledge_points": [
+      "导数",
+      "导数的计算"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.7,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u2_math_derivative_choice.jpg"
+    },
+    {
+     "index": 4,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "（5 分）设 $y = x^x$，则 $y'$ =（ ）",
+     "options": [
+      "A. $x^x (\\ln x + 1)$"
+     ],
+     "student_answer": "$x^x (\\ln x + 1)$",
+     "student_steps": "",
+     "correct_answer": "$x^x (\\ln x + 1)$",
+     "knowledge_points": [
+      "导数",
+      "指数函数求导"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.9,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u2_math_derivative_choice.jpg"
+    },
+    {
+     "index": 5,
+     "type": "选择题",
+     "qtype": "选择题",
+     "status": "wrong",
+     "stem": "（5 分）函数 $f(x) = |x|$ 在点 $x = 0$ 处（ ）",
+     "options": [
+      "A. 可导",
+      "B. 连续但不可导",
+      "C. 不连续",
+      "D. 可导但不连续"
+     ],
+     "student_answer": "A",
+     "student_steps": "左右导数分别是 $-1$ 和 $1$，不相等",
+     "correct_answer": "B",
+     "knowledge_points": [
+      "导数",
+      "函数连续性与可导性"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u2_math_derivative_choice.jpg"
+    }
+   ],
+   "status_hits": 5,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u3_math_integral_fill.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高等数学·不定积分与定积分",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+     "填空题",
+     "填空题",
+     "填空题",
+     "填空题",
+     "填空题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "blank",
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 7.95,
+   "quality": {
+    "score": 0.88,
+    "sharpness": 1183.9,
+    "brightness": 244.2,
+    "contrast": 0.202,
+    "ink": 0.0064,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "（6 分）$\\int (2x + 1) dx = $",
+     "options": [],
+     "student_answer": "$x^2 + x + C$",
+     "student_steps": "",
+     "correct_answer": "$x^2 + x + C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u3_math_integral_fill.jpg"
+    },
+    {
+     "index": 2,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "wrong",
+     "stem": "（6 分）$\\int x \\cdot e^{x^2} dx = $",
+     "options": [],
+     "student_answer": "$e^{x^2} + C$",
+     "student_steps": "",
+     "correct_answer": "$\\frac{1}{2}e^{x^2} + C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u3_math_integral_fill.jpg"
+    },
+    {
+     "index": 3,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "blank",
+     "stem": "（6 分）$\\int_1^e (\\ln x)/x dx = $",
+     "options": [],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "$1$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u3_math_integral_fill.jpg"
+    },
+    {
+     "index": 4,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "（6 分）$\\int_0^1 (2x + 1) dx = $",
+     "options": [],
+     "student_answer": "$2$",
+     "student_steps": "",
+     "correct_answer": "$2$",
+     "knowledge_points": [
+      "定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u3_math_integral_fill.jpg"
+    },
+    {
+     "index": 5,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "wrong",
+     "stem": "（6 分）$\\int 1/(1 + x^2) dx = $",
+     "options": [],
+     "student_answer": "$\\ln(1 + x^2) + C$",
+     "student_steps": "",
+     "correct_answer": "$\\arctan x + C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u3_math_integral_fill.jpg"
+    }
+   ],
+   "status_hits": 5,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u4_math_series_solution.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高等数学·数项级数",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+     "解答题",
+     "解答题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.85,
+   "elapsed": 5.91,
+   "quality": {
+    "score": 0.883,
+    "sharpness": 1303.0,
+    "brightness": 243.6,
+    "contrast": 0.222,
+    "ink": 0.0072,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "correct",
+     "stem": "判断级数 $\\sum_{n=1}^{\\infty} \\frac{n}{2^n}$ 的收敛性。",
+     "options": [],
+     "student_answer": "级数收敛。",
+     "student_steps": "用比值判别法。$\\lim |\\frac{a_{n+1}}{a_n}| = \\lim ((n+1)/2^{(n+1)} \\cdot (2^n/n)) = \\lim (n+1)/(2n) = 1/2 < 1$，故级数收敛。",
+     "correct_answer": "级数收敛。",
+     "knowledge_points": [
+      "比值判别法"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u4_math_series_solution.jpg"
+    },
+    {
+     "index": 2,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "wrong",
+     "stem": "判断级数 $\\sum_{n=1}^{\\infty} \\frac{1}{2n-1}$ 的收敛性。",
+     "options": [],
+     "student_answer": "级数收敛。",
+     "student_steps": "因为 $\\frac{1}{2n-1} < \\frac{1}{n}$，而 $\\sum \\frac{1}{n}$ 收敛，故由比较判别法，原级数收敛。",
+     "correct_answer": "级数发散。",
+     "knowledge_points": [
+      "比较判别法"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u4_math_series_solution.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u5_math_linalg_det.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "线性代数·行列式与矩阵",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+     "计算题",
+     "计算题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "线性代数",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 6.15,
+   "quality": {
+    "score": 0.884,
+    "sharpness": 1464.7,
+    "brightness": 243.7,
+    "contrast": 0.227,
+    "ink": 0.0083,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "计算题",
+     "qtype": "计算题",
+     "status": "correct",
+     "stem": "计算下列三阶行列式 D 的值：$D=\\begin{vmatrix} 2 & 0 & 1 \\\\ 1 & 3 & 2 \\\\ 1 & 0 & 1 \\end{vmatrix}$",
+     "options": [],
+     "student_answer": "3",
+     "student_steps": "按第一行展开，$D=2\\times(3\\times1-2\\times0)-0+1\\times(1\\times0-3\\times1)=2\\times3+1\\times(-3)=6-3=3$。",
+     "correct_answer": "3",
+     "knowledge_points": [
+      "行列式计算",
+      "三阶行列式展开"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "线性代数",
+     "grade": "大学",
+     "source_image": "u5_math_linalg_det.jpg"
+    },
+    {
+     "index": 2,
+     "type": "计算题",
+     "qtype": "计算题",
+     "status": "wrong",
+     "stem": "求 AB。$A=\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$，$B=\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$",
+     "options": [],
+     "student_answer": "[0, 2; 3, 0]",
+     "student_steps": "AB = [0, 2; 3, 0]。",
+     "correct_answer": "[2, 1; 4, 3]",
+     "knowledge_points": [
+      "矩阵乘法",
+      "行乘列"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "线性代数",
+     "grade": "大学",
+     "source_image": "u5_math_linalg_det.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u6_math_linalg_eigen.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "线性代数·特征值与线性方程组",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+     "解答题",
+     "解答题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "线性代数",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.85,
+   "elapsed": 6.43,
+   "quality": {
+    "score": 0.885,
+    "sharpness": 1489.1,
+    "brightness": 243.5,
+    "contrast": 0.232,
+    "ink": 0.0088,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "correct",
+     "stem": "求矩阵 A 的特征值。$A=\\begin{pmatrix} 2 & 1 \\\\ 1 & 2 \\end{pmatrix}$",
+     "options": [],
+     "student_answer": "$\\lambda_1=1, \\lambda_2=3$",
+     "student_steps": "$|\\lambda E-A|=(\\lambda-2)^2-1=\\lambda^2-4\\lambda+3=0$，解得 $\\lambda_1=1, \\lambda_2=3$",
+     "correct_answer": "$\\lambda_1=1, \\lambda_2=3$",
+     "knowledge_points": [
+      "特征值",
+      "矩阵行列式"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "线性代数",
+     "grade": "大学",
+     "source_image": "u6_math_linalg_eigen.jpg"
+    },
+    {
+     "index": 2,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "wrong",
+     "stem": "解线性方程组：$x+y+z=6, 2x-y+z=3, x+2y-z=2$",
+     "options": [],
+     "student_answer": "$x=1, y=2, z=7$",
+     "student_steps": "由第一个方程得 $z=6-x-y$，代入后两个方程得 $x-2y=-3, 2x+3y=8$，解得 $y=2, x=1$，所以 $z=6-1+2=7$",
+     "correct_answer": "$x=1, y=2, z=3$",
+     "knowledge_points": [
+      "线性方程组",
+      "代数运算"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "线性代数",
+     "grade": "大学",
+     "source_image": "u6_math_linalg_eigen.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u7_math_probability.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "概率论·条件概率与贝叶斯公式",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+     "解答题",
+     "解答题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "概率论与数理统计",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.95,
+   "elapsed": 6.32,
+   "quality": {
+    "score": 0.886,
+    "sharpness": 1663.2,
+    "brightness": 243.0,
+    "contrast": 0.241,
+    "ink": 0.0091,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "correct",
+     "stem": "设 P(A) = 0.5, P(B) = 0.4, P(AB) = 0.2, 求 P(A|B)。",
+     "options": [],
+     "student_answer": "0.5",
+     "student_steps": "由条件概率公式，P(A|B) = P(AB)/P(B) = 0.2/0.4 = 0.5。",
+     "correct_answer": "0.5",
+     "knowledge_points": [
+      "条件概率"
+     ],
+     "difficulty": "基础",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "概率论与数理统计",
+     "grade": "大学",
+     "source_image": "u7_math_probability.jpg"
+    },
+    {
+     "index": 2,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "wrong",
+     "stem": "甲线产量占 60%，次品率 2%；乙线产量占 40%，次品率 5%。随机取一件发",
+     "options": [],
+     "student_answer": "0.6",
+     "student_steps": "设 A = 来自甲线，B = 取到次品。P(A|B) = P(A)P(B|A)/P(B|A) = (0.6×0.02)/0.02 = 0.6。",
+     "correct_answer": "0.375",
+     "knowledge_points": [
+      "全概率公式",
+      "条件概率"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "概率论与数理统计",
+     "grade": "大学",
+     "source_image": "u7_math_probability.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u8_math_ode.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "常微分方程·一阶与二阶线性方程",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+     "解答题",
+     "解答题"
+    ],
+    "expected_statuses": [
+     "wrong",
+     "correct"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "微积分",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.92,
+   "elapsed": 6.84,
+   "quality": {
+    "score": 0.882,
+    "sharpness": 1266.3,
+    "brightness": 243.7,
+    "contrast": 0.211,
+    "ink": 0.0069,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "自动对比度拉伸",
+    "缩放至 1131×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "wrong",
+     "stem": "（10 分）求微分方程 $y' = 2xy$ 的通解。",
+     "options": [],
+     "student_answer": "y = e^{x^2} + C_0",
+     "student_steps": "解：分离变量得 $\\frac{dy}{y} = 2x dx$，两边积分：$\\ln|y| = x^2 + C$，所以 $y = e^{x^2} + C_0$。常数在指数外面乘：$y = C \\cdot e^{x^2}$",
+     "correct_answer": "y = C e^{x^2}",
+     "knowledge_points": [
+      "微分方程",
+      "分离变量法",
+      "通解"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "微积分",
+     "grade": "大学",
+     "source_image": "u8_math_ode.jpg"
+    },
+    {
+     "index": 2,
+     "type": "解答题",
+     "qtype": "解答题",
+     "status": "correct",
+     "stem": "（10 分）求微分方程 $y'' - 3y' + 2y = 0$ 的通解。",
+     "options": [],
+     "student_answer": "y = C_1 e^x + C_2 e^{2x}",
+     "student_steps": "解：特征方程为 $r^2 - 3r + 2 = 0$，解得 $r_1 = 1$，$r_2 = 2$，所以通解 $y = C_1 e^x + C_2 e^{2x}$。",
+     "correct_answer": "y = C_1 e^x + C_2 e^{2x}",
+     "knowledge_points": [
+      "微分方程",
+      "特征方程",
+      "通解"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "微积分",
+     "grade": "大学",
+     "source_image": "u8_math_ode.jpg"
+    }
+   ],
+   "status_hits": 2,
+   "count_ok": true,
+   "subject_ok": true
+  },
+  {
+   "file": "u9_math_integral_tilted.jpg",
+   "expect": {
+    "subject": "数学",
+    "subject_detail": "高等数学·不定积分与定积分（u3 的倾斜模糊压暗带水印版本）",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+     "填空题",
+     "填空题",
+     "填空题",
+     "填空题",
+     "填空题"
+    ],
+    "expected_statuses": [
+     "correct",
+     "wrong",
+     "blank",
+     "correct",
+     "wrong"
+    ]
+   },
+   "subject": "数学",
+   "subject_detail": "高等数学",
+   "grade": "大学",
+   "engine": "local:qwen3-vl:4b",
+   "route": "local",
+   "confidence": 0.85,
+   "elapsed": 8.7,
+   "quality": {
+    "score": 0.891,
+    "sharpness": 610.9,
+    "brightness": 206.4,
+    "contrast": 0.27,
+    "ink": 0.0069,
+    "need_cloud": false
+   },
+   "preprocess": [
+    "纠偏 +7.0°",
+    "提亮（gamma 0.61）",
+    "自动对比度拉伸",
+    "缩放至 1221×1600"
+   ],
+   "error": "",
+   "questions": [
+    {
+     "index": 1,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "1. (6 分) $\\int (2x+1) dx = $",
+     "options": [],
+     "student_answer": "$x^2+x+C$",
+     "student_steps": "",
+     "correct_answer": "$x^2+x+C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.98,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u9_math_integral_tilted.jpg"
+    },
+    {
+     "index": 2,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "wrong",
+     "stem": "2. (6 分) $\\int x \\cdot e^{x^2} dx = $",
+     "options": [],
+     "student_answer": "$e^{x^2}+C$",
+     "student_steps": "",
+     "correct_answer": "$\\frac{1}{2}e^{x^2}+C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.85,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u9_math_integral_tilted.jpg"
+    },
+    {
+     "index": 3,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "blank",
+     "stem": "3. (6 分) $\\int_1^e (\\ln x)/x dx = $",
+     "options": [],
+     "student_answer": "",
+     "student_steps": "",
+     "correct_answer": "$1$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.95,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u9_math_integral_tilted.jpg"
+    },
+    {
+     "index": 4,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "correct",
+     "stem": "4. (6 分) $\\int_0^1 (2x+1) dx = $",
+     "options": [],
+     "student_answer": "$2$",
+     "student_steps": "",
+     "correct_answer": "$2$",
+     "knowledge_points": [
+      "定积分"
+     ],
+     "difficulty": "简单",
+     "confidence": 0.99,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u9_math_integral_tilted.jpg"
+    },
+    {
+     "index": 5,
+     "type": "填空题",
+     "qtype": "填空题",
+     "status": "wrong",
+     "stem": "5. (6 分) $\\int 1/(1+x^2) dx = $",
+     "options": [],
+     "student_answer": "$\\ln(1+x^2)+C$",
+     "student_steps": "",
+     "correct_answer": "$\\arctan x + C$",
+     "knowledge_points": [
+      "不定积分"
+     ],
+     "difficulty": "中等",
+     "confidence": 0.92,
+     "engine": "local:qwen3-vl:4b",
+     "subject": "数学",
+     "subject_detail": "高等数学",
+     "grade": "大学",
+     "source_image": "u9_math_integral_tilted.jpg"
+    }
+   ],
+   "status_hits": 5,
+   "count_ok": true,
+   "subject_ok": true
+  }
+ ]
+}

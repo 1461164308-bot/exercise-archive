@@ -40,6 +40,14 @@ from ctypes import wintypes
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(BASE_DIR, "samples")
 
+# 把项目根目录塞进 sys.path，才能 `from exerarchive import ...`。
+# 缺了这三行的后果实测过：`python tools\make_samples.py`（也就是双击
+# 「生成示例习题图.bat」）直接 ModuleNotFoundError: No module named 'exerarchive' ——
+# 因为运行脚本时 sys.path[0] 是**脚本所在目录**（tools\），不是项目根目录。
+# 其它 tools\*.py 入口都有这三行，这里是漏掉的那个（tests/test_tool_entrypoints.py 守着）。
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 PAGE_W, PAGE_H = 1240, 1754          # A4 @150dpi
 MARGIN = 78                          # 版心左右边距
 TEXT_W = PAGE_W - MARGIN * 2         # 版心宽度
@@ -80,6 +88,9 @@ DT_VCENTER = 0x00000004
 DT_SINGLELINE = 0x00000020
 DT_NOCLIP = 0x00000100
 SRCCOPY = 0x00CC0020
+# GDI 库存对象：空心画刷（== HOLLOW_BRUSH）。Ellipse/Rectangle 想画"只有边、不填充"
+# 就必须显式选它，否则会用 DC 的默认白刷把图形内部涂白。
+NULL_BRUSH = 5
 
 # ================================================================ ctypes 绑定
 user32 = ctypes.WinDLL("user32", use_last_error=True)
@@ -145,6 +156,10 @@ gdi32.CreatePen.argtypes = [ctypes.c_int, ctypes.c_int, wintypes.DWORD]
 gdi32.CreatePen.restype = wintypes.HPEN
 gdi32.CreateSolidBrush.argtypes = [wintypes.DWORD]
 gdi32.CreateSolidBrush.restype = wintypes.HBRUSH
+# GetStockObject(NULL_BRUSH)：GDI 的"空心画刷"。**必须显式选它**才能画不填充的
+# 矩形/椭圆 —— 见 Canvas._brush() 里记的那个坑。
+gdi32.GetStockObject.argtypes = [ctypes.c_int]
+gdi32.GetStockObject.restype = wintypes.HGDIOBJ
 gdi32.SetTextColor.argtypes = [wintypes.HDC, wintypes.DWORD]
 gdi32.SetBkMode.argtypes = [wintypes.HDC, ctypes.c_int]
 gdi32.SetTextAlign.argtypes = [wintypes.HDC, wintypes.UINT]
@@ -441,11 +456,22 @@ class Canvas:
             gdi32.SelectObject(self.hdc, old)
             gdi32.DeleteObject(hb)
 
+    def _brush(self, fill):
+        """填充色 → 画刷句柄；``fill=None`` 返回**空心画刷**（不填充）。
+
+        这里踩过一个很隐蔽的坑：GDI 的 ``Ellipse``/``Rectangle`` **一定会**用当前画刷填充，
+        而 DC 的默认画刷是白色的。早期版本 ``fill=None`` 时选了"纸色实心画刷"，
+        结果 ``hand_circle`` 画红圈时，圈内的**题号被整块擦成纸色** ——
+        样张 s1 的第 2 题、大学数学习题样张 u1 的第 2/4 题都是这样丢的题号。
+        空心必须显式选 ``GetStockObject(NULL_BRUSH)``。
+        """
+        if fill is None:
+            return gdi32.GetStockObject(NULL_BRUSH)
+        return gdi32.CreateSolidBrush(_colorref(fill))
+
     def frame_rect(self, x1, y1, x2, y2, color=INK, width=1, fill=None):
-        if fill is not None:
-            self.fill_rect(x1, y1, x2, y2, fill)
         hp = self.pen(color, width)
-        hb = gdi32.CreateSolidBrush(_colorref(fill if fill is not None else PAPER))
+        hb = self._brush(fill)
         oldp = gdi32.SelectObject(self.hdc, hp)
         oldb = gdi32.SelectObject(self.hdc, hb)
         try:
@@ -453,14 +479,15 @@ class Canvas:
         finally:
             gdi32.SelectObject(self.hdc, oldp)
             gdi32.SelectObject(self.hdc, oldb)
-            gdi32.DeleteObject(hb)
+            if fill is not None:
+                gdi32.DeleteObject(hb)
 
     def circle(self, cx, cy, r, color=INK, width=1, fill=None):
         self.ellipse(cx, cy, r, r, color=color, width=width, fill=fill)
 
     def ellipse(self, cx, cy, rx, ry, color=INK, width=1, fill=None):
         hp = self.pen(color, width)
-        hb = gdi32.CreateSolidBrush(_colorref(fill if fill is not None else PAPER))
+        hb = self._brush(fill)
         oldp = gdi32.SelectObject(self.hdc, hp)
         oldb = gdi32.SelectObject(self.hdc, hb)
         try:
@@ -468,7 +495,8 @@ class Canvas:
         finally:
             gdi32.SelectObject(self.hdc, oldp)
             gdi32.SelectObject(self.hdc, oldb)
-            gdi32.DeleteObject(hb)
+            if fill is not None:
+                gdi32.DeleteObject(hb)
 
     def text_box(self, left, top, right, bottom, s, size, color=INK, families=None,
                  bold=False, align="center"):

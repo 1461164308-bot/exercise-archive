@@ -1,0 +1,154 @@
+{
+  "u1_math_limits_fill.jpg": {
+    "subject": "数学",
+    "subject_detail": "高等数学·极限与连续",
+    "grade": "大学",
+    "question_count": 6,
+    "types": [
+      "填空题",
+      "填空题",
+      "填空题",
+      "选择题",
+      "填空题",
+      "选择题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "correct",
+      "wrong",
+      "wrong",
+      "correct"
+    ]
+  },
+  "u2_math_derivative_choice.jpg": {
+    "subject": "数学",
+    "subject_detail": "高等数学·导数与微分",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+      "选择题",
+      "选择题",
+      "选择题",
+      "填空题",
+      "选择题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "blank",
+      "correct",
+      "wrong"
+    ]
+  },
+  "u3_math_integral_fill.jpg": {
+    "subject": "数学",
+    "subject_detail": "高等数学·不定积分与定积分",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+      "填空题",
+      "填空题",
+      "填空题",
+      "填空题",
+      "填空题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "blank",
+      "correct",
+      "wrong"
+    ]
+  },
+  "u4_math_series_solution.jpg": {
+    "subject": "数学",
+    "subject_detail": "高等数学·数项级数",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+      "解答题",
+      "解答题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong"
+    ]
+  },
+  "u5_math_linalg_det.jpg": {
+    "subject": "数学",
+    "subject_detail": "线性代数·行列式与矩阵",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+      "计算题",
+      "计算题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong"
+    ]
+  },
+  "u6_math_linalg_eigen.jpg": {
+    "subject": "数学",
+    "subject_detail": "线性代数·特征值与线性方程组",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+      "解答题",
+      "解答题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong"
+    ]
+  },
+  "u7_math_probability.jpg": {
+    "subject": "数学",
+    "subject_detail": "概率论·条件概率与贝叶斯公式",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+      "解答题",
+      "解答题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong"
+    ]
+  },
+  "u8_math_ode.jpg": {
+    "subject": "数学",
+    "subject_detail": "常微分方程·一阶与二阶线性方程",
+    "grade": "大学",
+    "question_count": 2,
+    "types": [
+      "解答题",
+      "解答题"
+    ],
+    "expected_statuses": [
+      "wrong",
+      "correct"
+    ]
+  },
+  "u9_math_integral_tilted.jpg": {
+    "subject": "数学",
+    "subject_detail": "高等数学·不定积分与定积分（u3 的倾斜模糊压暗带水印版本）",
+    "grade": "大学",
+    "question_count": 5,
+    "types": [
+      "填空题",
+      "填空题",
+      "填空题",
+      "填空题",
+      "填空题"
+    ],
+    "expected_statuses": [
+      "correct",
+      "wrong",
+      "blank",
+      "correct",
+      "wrong"
+    ]
+  }
+}

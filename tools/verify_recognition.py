@@ -30,21 +30,26 @@ from exerarchive.pipeline import Pipeline  # noqa: E402
 STATUS_CN = {"wrong": "错题", "correct": "正确", "blank": "未做", "unknown": "未判定"}
 
 
-def load_truth() -> dict:
-    path = os.path.join(ROOT, "samples", "ground_truth.json")
+def load_truth(sample_dir: str = "samples") -> dict:
+    path = os.path.join(ROOT, sample_dir, "ground_truth.json")
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="习题识别端到端验证")
-    ap.add_argument("--only", nargs="*", default=None, help="只跑指定样张前缀，如 s1 s6")
+    ap.add_argument("--only", nargs="*", default=None, help="只跑指定样张前缀，如 s1 s6 或 u1 u5")
     ap.add_argument("--force", default=None, choices=["local", "cloud"], help="强制指定引擎")
     ap.add_argument("--no-preprocess", action="store_true", help="跳过自动预处理（测原图识别率）")
-    ap.add_argument("--out", default=os.path.join(ROOT, "samples", "recognition_report.json"))
+    ap.add_argument("--dir", default="samples",
+                    help="样张目录（默认 samples；指向 samples\\大学数学 就跑大学数学那套完备性样张）")
+    ap.add_argument("--out", default=None,
+                    help="结果 JSON 输出路径（默认写在样张目录下的 recognition_report.json）")
     ap.add_argument("--use-real-data", action="store_true",
                     help="用真实 data/ 目录（默认用临时目录，避免把预处理图写进你的数据目录）")
     args = ap.parse_args()
+    if not args.out:
+        args.out = os.path.join(ROOT, args.dir, "recognition_report.json")
 
     # 默认把数据目录切到临时位置：这个脚本会写预处理图（data/preprocessed），
     # 早期版本直接用真实 data/，跑一次验证就在用户的数据目录里留一堆 _prep.jpg。
@@ -55,7 +60,7 @@ def main() -> int:
     logging_setup.setup()
     cfg = config.load_config()
     config.bootstrap_local_model(cfg)
-    truth = load_truth()
+    truth = load_truth(args.dir)
 
     pipe = Pipeline(cfg, on_log=lambda m: print("   ", m, flush=True))
     print(f"运行模式：{cfg.mode_label()}　本地模型：{cfg.get('local.model')}　"
@@ -70,7 +75,7 @@ def main() -> int:
         stem = name.split("_")[0]
         if args.only and stem not in args.only:
             continue
-        path = os.path.join(ROOT, "samples", name)
+        path = os.path.join(ROOT, args.dir, name)
         print(f"\n▶ {name}（期望：{expect['subject']} / {expect['question_count']} 题 / "
               f"{[''.join(STATUS_CN.get(s, s)) for s in expect['expected_statuses']]}）")
         out = pipe.process_image(path, force=args.force, skip_preprocess=args.no_preprocess)

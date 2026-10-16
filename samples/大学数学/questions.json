@@ -1,0 +1,586 @@
+{
+  "u1_math_limits_fill.jpg": [
+    {
+      "no": 1,
+      "type": "填空题",
+      "score": 5,
+      "stem": "求极限 lim_{x→0} (sin 3x)/x =",
+      "options": [],
+      "student_answer": "3",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "3",
+      "error_type": "",
+      "knowledge_points": [
+        "极限",
+        "等价无穷小"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "填空题",
+      "score": 5,
+      "stem": "求极限 lim_{x→∞} (1 + 2/x)^x =",
+      "options": [],
+      "student_answer": "e",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "e^2",
+      "error_type": "公式记错",
+      "knowledge_points": [
+        "重要极限",
+        "极限"
+      ]
+    },
+    {
+      "no": 3,
+      "type": "填空题",
+      "score": 5,
+      "stem": "设 f(x) = (x^2 - 1)/(x - 1)，则 x = 1 是 f(x) 的",
+      "options": [],
+      "student_answer": "可去间断点",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "可去间断点",
+      "error_type": "",
+      "knowledge_points": [
+        "函数连续性",
+        "间断点分类"
+      ]
+    },
+    {
+      "no": 4,
+      "type": "选择题",
+      "score": 5,
+      "stem": "当 x → 0 时，与 x 等价的无穷小是",
+      "options": [
+        "A. 1 - cos x",
+        "B. tan 2x",
+        "C. sin x",
+        "D. ln(1 + x^2)"
+      ],
+      "student_answer": "B",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "C",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "等价无穷小",
+        "极限"
+      ]
+    },
+    {
+      "no": 5,
+      "type": "填空题",
+      "score": 5,
+      "stem": "设 f(x) = x·sin(1/x)，则 lim_{x→0} f(x) =",
+      "options": [],
+      "student_answer": "不存在",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "0",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "极限",
+        "夹逼准则",
+        "无穷小与有界量之积"
+      ]
+    },
+    {
+      "no": 6,
+      "type": "选择题",
+      "score": 5,
+      "stem": "设 f(x) = ln(1 + x)，则 f'(0) =",
+      "options": [
+        "A. 0",
+        "B. 1",
+        "C. 1/2",
+        "D. e"
+      ],
+      "student_answer": "B",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "B",
+      "error_type": "",
+      "knowledge_points": [
+        "导数公式",
+        "导数值"
+      ]
+    }
+  ],
+  "u2_math_derivative_choice.jpg": [
+    {
+      "no": 1,
+      "type": "选择题",
+      "score": 5,
+      "stem": "设 y = x^3 + ln x，则 y' =",
+      "options": [
+        "A. 3x^2 + 1/x",
+        "B. 3x^2 + ln x",
+        "C. x^2 + 1/x",
+        "D. 3x^2 - 1/x"
+      ],
+      "student_answer": "A",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "A",
+      "error_type": "",
+      "knowledge_points": [
+        "导数公式",
+        "求导法则"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "选择题",
+      "score": 5,
+      "stem": "设 y = sin(2x)，则 dy =",
+      "options": [
+        "A. cos 2x dx",
+        "B. 2cos 2x dx",
+        "C. -2cos 2x dx",
+        "D. 2sin 2x dx"
+      ],
+      "student_answer": "A",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "B",
+      "error_type": "公式记错",
+      "knowledge_points": [
+        "复合函数求导",
+        "微分"
+      ]
+    },
+    {
+      "no": 3,
+      "type": "选择题",
+      "score": 5,
+      "stem": "设 y = e^x·arctan x，则 y'(0) =",
+      "options": [
+        "A. 0",
+        "B. 1",
+        "C. π/4",
+        "D. 2"
+      ],
+      "student_answer": "",
+      "student_steps": [],
+      "status": "blank",
+      "correct_answer": "B",
+      "error_type": "",
+      "knowledge_points": [
+        "乘积求导",
+        "导数值"
+      ]
+    },
+    {
+      "no": 4,
+      "type": "填空题",
+      "score": 5,
+      "stem": "设 y = x^x，则 y' =",
+      "options": [],
+      "student_answer": "x^x(ln x + 1)",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "x^x(ln x + 1)",
+      "error_type": "",
+      "knowledge_points": [
+        "幂指函数求导",
+        "对数求导法"
+      ]
+    },
+    {
+      "no": 5,
+      "type": "选择题",
+      "score": 5,
+      "stem": "函数 f(x) = |x| 在点 x = 0 处",
+      "options": [
+        "A. 可导",
+        "B. 连续但不可导",
+        "C. 不连续",
+        "D. 可导但不连续"
+      ],
+      "student_answer": "A",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "B",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "导数定义",
+        "分段函数求导"
+      ]
+    }
+  ],
+  "u3_math_integral_fill.jpg": [
+    {
+      "no": 1,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ (2x + 1) dx =",
+      "options": [],
+      "student_answer": "x^2 + x + C",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "x^2 + x + C",
+      "error_type": "",
+      "knowledge_points": [
+        "不定积分",
+        "基本积分公式"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ x·e^(x^2) dx =",
+      "options": [],
+      "student_answer": "e^(x^2) + C",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "(1/2)e^(x^2) + C",
+      "error_type": "计算失误",
+      "knowledge_points": [
+        "不定积分",
+        "第一换元法"
+      ]
+    },
+    {
+      "no": 3,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫_1^e (ln x)/x dx =",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [],
+      "status": "blank",
+      "correct_answer": "1/2",
+      "error_type": "",
+      "knowledge_points": [
+        "定积分",
+        "换元积分法"
+      ]
+    },
+    {
+      "no": 4,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫_0^1 (2x + 1) dx =",
+      "options": [],
+      "student_answer": "2",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "2",
+      "error_type": "",
+      "knowledge_points": [
+        "定积分",
+        "牛顿-莱布尼茨公式"
+      ]
+    },
+    {
+      "no": 5,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ 1/(1 + x^2) dx =",
+      "options": [],
+      "student_answer": "ln(1 + x^2) + C",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "arctan x + C",
+      "error_type": "公式记错",
+      "knowledge_points": [
+        "不定积分",
+        "基本积分公式"
+      ]
+    }
+  ],
+  "u4_math_series_solution.jpg": [
+    {
+      "no": 1,
+      "type": "解答题",
+      "score": 10,
+      "stem": "判别级数 ∑_{n=1}^{∞} n/2^n 的收敛性。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：用比值判别法。",
+        "lim |a_{n+1}/a_n| = lim ((n+1)/2^(n+1))·(2^n/n)",
+        "= lim (n+1)/(2n) = 1/2 < 1，",
+        "故级数收敛。"
+      ],
+      "status": "correct",
+      "correct_answer": "收敛（比值判别法，极限为 1/2）",
+      "error_type": "",
+      "knowledge_points": [
+        "正项级数",
+        "比值判别法"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "解答题",
+      "score": 10,
+      "stem": "判别级数 ∑_{n=1}^{∞} 1/(2n-1) 的收敛性。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：因为 1/(2n-1) < 1/n，",
+        "而 ∑ 1/n 收敛，",
+        "故由比较判别法，原级数收敛。"
+      ],
+      "status": "wrong",
+      "correct_answer": "发散（1/(2n-1) ~ 1/(2n)，与调和级数同阶）",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "正项级数",
+        "比较判别法",
+        "调和级数"
+      ]
+    }
+  ],
+  "u5_math_linalg_det.jpg": [
+    {
+      "no": 1,
+      "type": "计算题",
+      "score": 10,
+      "stem": "计算下列三阶行列式 D 的值：",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：按第一行展开，",
+        "D = 2×(3×1 - 2×0) - 0 + 1×(1×0 - 3×1)",
+        "= 2×3 + 1×(-3) = 6 - 3 = 3。"
+      ],
+      "status": "correct",
+      "correct_answer": "3",
+      "error_type": "",
+      "knowledge_points": [
+        "行列式",
+        "按行展开",
+        "代数余子式"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "计算题",
+      "score": 10,
+      "stem": "求 AB。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：AB = [0, 2; 3, 0]。"
+      ],
+      "status": "wrong",
+      "correct_answer": "AB = [[2, 1], [4, 3]]",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "矩阵乘法"
+      ]
+    }
+  ],
+  "u6_math_linalg_eigen.jpg": [
+    {
+      "no": 1,
+      "type": "解答题",
+      "score": 10,
+      "stem": "求矩阵 A 的特征值。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：|λE - A| = (λ-2)^2 - 1 = λ^2 - 4λ + 3 = 0，",
+        "解得 λ_1 = 1，λ_2 = 3。"
+      ],
+      "status": "correct",
+      "correct_answer": "λ1 = 1，λ2 = 3",
+      "error_type": "",
+      "knowledge_points": [
+        "特征值",
+        "特征方程"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "解答题",
+      "score": 10,
+      "stem": "解线性方程组：x + y + z = 6，2x - y + z = 3，x + 2y - z = 2。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：由第一个方程得 z = 6 - x - y，",
+        "代入后两个方程得 x - 2y = -3，2x + 3y = 8，",
+        "解得 y = 2，x = 1，",
+        "所以 z = 6 - 1 + 2 = 7。"
+      ],
+      "status": "wrong",
+      "correct_answer": "(x, y, z) = (1, 2, 3)",
+      "error_type": "计算失误",
+      "knowledge_points": [
+        "线性方程组",
+        "高斯消元法",
+        "代入消元"
+      ]
+    }
+  ],
+  "u7_math_probability.jpg": [
+    {
+      "no": 1,
+      "type": "解答题",
+      "score": 10,
+      "stem": "设 P(A) = 0.5，P(B) = 0.4，P(AB) = 0.2，求 P(A|B)。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：由条件概率公式，",
+        "P(A|B) = P(AB)/P(B) = 0.2/0.4 = 0.5。"
+      ],
+      "status": "correct",
+      "correct_answer": "0.5",
+      "error_type": "",
+      "knowledge_points": [
+        "条件概率"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "解答题",
+      "score": 10,
+      "stem": "甲线产量占 60%，次品率 2%；乙线产量占 40%，次品率 5%。随机取一件发现是次品，求它来自甲线的概率。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：设 A = 来自甲线，B = 取到次品。",
+        "P(A|B) = P(A)P(B|A) / P(B|A)",
+        "= (0.6×0.02)/0.02 = 0.6。"
+      ],
+      "status": "wrong",
+      "correct_answer": "0.375",
+      "error_type": "公式记错",
+      "knowledge_points": [
+        "贝叶斯公式",
+        "全概率公式"
+      ]
+    }
+  ],
+  "u8_math_ode.jpg": [
+    {
+      "no": 1,
+      "type": "解答题",
+      "score": 10,
+      "stem": "求微分方程 y' = 2xy 的通解。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：分离变量得 dy/y = 2x dx，",
+        "两边积分：ln|y| = x^2 + C，",
+        "所以 y = e^(x^2) + C。"
+      ],
+      "status": "wrong",
+      "correct_answer": "y = C·e^(x^2)",
+      "error_type": "概念错误",
+      "knowledge_points": [
+        "一阶微分方程",
+        "分离变量法"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "解答题",
+      "score": 10,
+      "stem": "求微分方程 y'' - 3y' + 2y = 0 的通解。",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [
+        "解：特征方程为 r^2 - 3r + 2 = 0，",
+        "解得 r_1 = 1，r_2 = 2，",
+        "所以通解 y = C_1·e^x + C_2·e^(2x)。"
+      ],
+      "status": "correct",
+      "correct_answer": "y = C1·e^x + C2·e^(2x)",
+      "error_type": "",
+      "knowledge_points": [
+        "二阶常系数线性微分方程",
+        "特征方程"
+      ]
+    }
+  ],
+  "u9_math_integral_tilted.jpg": [
+    {
+      "no": 1,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ (2x + 1) dx =",
+      "options": [],
+      "student_answer": "x^2 + x + C",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "x^2 + x + C",
+      "error_type": "",
+      "knowledge_points": [
+        "不定积分",
+        "基本积分公式"
+      ]
+    },
+    {
+      "no": 2,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ x·e^(x^2) dx =",
+      "options": [],
+      "student_answer": "e^(x^2) + C",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "(1/2)e^(x^2) + C",
+      "error_type": "计算失误",
+      "knowledge_points": [
+        "不定积分",
+        "第一换元法"
+      ]
+    },
+    {
+      "no": 3,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫_1^e (ln x)/x dx =",
+      "options": [],
+      "student_answer": "",
+      "student_steps": [],
+      "status": "blank",
+      "correct_answer": "1/2",
+      "error_type": "",
+      "knowledge_points": [
+        "定积分",
+        "换元积分法"
+      ]
+    },
+    {
+      "no": 4,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫_0^1 (2x + 1) dx =",
+      "options": [],
+      "student_answer": "2",
+      "student_steps": [],
+      "status": "correct",
+      "correct_answer": "2",
+      "error_type": "",
+      "knowledge_points": [
+        "定积分",
+        "牛顿-莱布尼茨公式"
+      ]
+    },
+    {
+      "no": 5,
+      "type": "填空题",
+      "score": 6,
+      "stem": "∫ 1/(1 + x^2) dx =",
+      "options": [],
+      "student_answer": "ln(1 + x^2) + C",
+      "student_steps": [],
+      "status": "wrong",
+      "correct_answer": "arctan x + C",
+      "error_type": "公式记错",
+      "knowledge_points": [
+        "不定积分",
+        "基本积分公式"
+      ]
+    }
+  ]
+}
