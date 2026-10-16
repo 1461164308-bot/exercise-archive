@@ -29,7 +29,8 @@
 
 ## 🚀 快速开始（四步）
 
-1. **下载**：打开本仓库的 [**Releases**](../../releases) 页，下载 `AI错题本-便携版-v1.2.0.zip`（约 19 MB）。
+1. **下载**：打开本仓库的 [**Releases**](../../releases) 页，下载 **`exercise-archive-portable-v1.2.0.zip`**（约 19 MB，带 `portable` 字样的那个）。
+   （另一个 `exercise-archive-source-v1.2.0.zip` 是纯源码，需要目标电脑已装 Python。）
 2. **解压**：解压到**不含中文和空格的路径**，例如 `D:\AI错题本`
    （不要放在 `C:\Program Files` 下——那里没有写权限，题库会存不下来）。
 3. **启动**：双击解压出来的 **`启动.bat`**。窗口打开即成功，此时还识别不了，先做第 4 步。
