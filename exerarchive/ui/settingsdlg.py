@@ -18,6 +18,7 @@ from typing import Callable, Dict, Optional
 from ..config import Config, default_ollama_paths
 from ..logging_setup import get_logger
 from ..vlm import ModelClient
+from .softui import ScrollableFrame
 from .widgets import COLORS
 
 log = get_logger("ui.settings")
@@ -33,7 +34,7 @@ class SettingsDialog(tk.Toplevel):
         self.on_saved = on_saved
         self.transient(master)
         self.resizable(True, True)
-        self.geometry("760x620")
+        self.geometry("860x700")
         self.minsize(700, 560)
         self._vars: Dict[str, tk.Variable] = {}
         self._build()
@@ -57,13 +58,36 @@ class SettingsDialog(tk.Toplevel):
                 anchor="w", pady=(0, 4))
         return entry
 
+    def _tab(self, nb: ttk.Notebook, title: str) -> ttk.Frame:
+        """新建标签页，内容放进**可滚动区域**，返回可直接 pack 内容的容器。
+
+        两层保险，都是为了"底部内容/按钮永远够得着"：
+        1. 标签页内容可滚动 —— 以前是普通 Frame，内容比窗口高时底部复选框会被裁掉；
+        2. 配合 ``_build()`` 里**先 pack 按钮栏**，保证「保存」始终可见。
+        """
+        scroll = ScrollableFrame(nb)
+        nb.add(scroll, text=title)
+        body = ttk.Frame(scroll.body, padding=14)
+        body.pack(fill="both", expand=True)
+        return body
+
     def _build(self) -> None:
+        # 按钮栏**必须先 pack**：Tk 的 pack 按调用顺序分配空间。以前 Notebook 先 pack
+        # 且 expand=True，而它的请求高度（实测 771px）大于窗口（700px），于是按钮栏
+        # 被压成 1 像素、「保存」按钮 mapped=False —— 用户反馈「设置中改换设置无保存
+        # 选项，无法正常改设置」。先给按钮栏占好底部那一条，Notebook 再填剩下的空间。
+        bar = ttk.Frame(self, padding=(10, 0, 10, 10))
+        bar.pack(side="bottom", fill="x")
+        ttk.Button(bar, text="恢复默认", command=self.restore_defaults).pack(side="left")
+        ttk.Button(bar, text="取消", command=self.destroy).pack(side="right")
+        self.save_button = ttk.Button(bar, text="保存", command=self.save)
+        self.save_button.pack(side="right", padx=8)
+
         nb = ttk.Notebook(self)
         nb.pack(fill="both", expand=True, padx=10, pady=10)
 
         # ---------------- 运行模式 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="运行模式")
+        tab = self._tab(nb, "运行模式")
         ttk.Label(tab, text="本地优先，云端兜底（推荐）：常规习题用本机模型离线识别，"
                             "遇到模糊、字迹潦草、置信度低的题自动交给云端复核。",
                   wraplength=660, style="Muted.TLabel").pack(anchor="w", pady=(0, 10))
@@ -91,8 +115,7 @@ class SettingsDialog(tk.Toplevel):
                                                               tk.BooleanVar)).pack(anchor="w", pady=2)
 
         # ---------------- 本地模型 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="本地模型")
+        tab = self._tab(nb, "本地模型")
         ttk.Label(tab, text="本机轻量视觉模型：负责离线识别。推荐 Ollama + qwen3-vl:4b"
                             "（4.4B，4G 左右显存即可流畅运行）。",
                   wraplength=660, style="Muted.TLabel").pack(anchor="w", pady=(0, 8))
@@ -145,8 +168,7 @@ class SettingsDialog(tk.Toplevel):
                                            tk.BooleanVar)).pack(anchor="w", pady=2)
 
         # ---------------- 云端模型 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="云端模型")
+        tab = self._tab(nb, "云端模型")
         ttk.Checkbutton(tab, text="启用云端增强（填好 API Key 后勾选）",
                         variable=self._var("cloud.enabled", bool(self.cfg.get("cloud.enabled", False)),
                                            tk.BooleanVar)).pack(anchor="w", pady=(0, 8))
@@ -183,8 +205,7 @@ class SettingsDialog(tk.Toplevel):
         self.load_profile()
 
         # ---------------- 隐私与存储 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="隐私与存储")
+        tab = self._tab(nb, "隐私与存储")
         for key, text, hint in (
             ("privacy.encrypt_db", "题库正文加密存储（推荐）",
              "题干、作答、错题报告在数据库里加密保存，别人拷走 archive.db 也读不出内容。"),
@@ -202,8 +223,7 @@ class SettingsDialog(tk.Toplevel):
                   wraplength=660, style="Muted.TLabel").pack(anchor="w")
 
         # ---------------- 归档 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="归档")
+        tab = self._tab(nb, "归档")
         r = ttk.Frame(tab)
         r.pack(fill="x", pady=3)
         ttk.Label(r, text="归档根目录", width=18).pack(side="left")
@@ -222,8 +242,7 @@ class SettingsDialog(tk.Toplevel):
                                                               tk.BooleanVar)).pack(anchor="w", pady=2)
 
         # ---------------- 界面与公式 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="界面与公式")
+        tab = self._tab(nb, "界面与公式")
         ttk.Label(tab, text="公式显示", style="Title.TLabel").pack(anchor="w")
         r = ttk.Frame(tab)
         r.pack(fill="x", pady=3)
@@ -249,13 +268,15 @@ class SettingsDialog(tk.Toplevel):
                   style="Muted.TLabel", wraplength=660).pack(anchor="w", pady=(6, 0))
         ttk.Separator(tab).pack(fill="x", pady=12)
         ttk.Label(tab, text="窗口与预览", style="Title.TLabel").pack(anchor="w")
+        ttk.Checkbutton(tab, text="启用轻量动效（按钮悬停、导航切换与任务进度）",
+                        variable=self._var("ui.animations", bool(self.cfg.get("ui.animations", True)),
+                                           tk.BooleanVar)).pack(anchor="w", pady=(8, 12))
         self._row(tab, "界面字体", "ui.font_family", "换字体后需要重启软件")
         self._row(tab, "字号", "ui.font_size", "正文基准字号（公式大小按它换算）")
         self._row(tab, "预览区最长边", "ui.image_display_max", "图片预览的显示尺寸上限（像素）")
 
         # ---------------- 关于 ----------------
-        tab = ttk.Frame(nb, padding=14)
-        nb.add(tab, text="关于")
+        tab = self._tab(nb, "关于")
         from .. import paths
 
         ttk.Label(tab, text=f"{paths.APP_NAME}　v{paths.APP_VERSION}", style="Title.TLabel").pack(anchor="w")
@@ -264,13 +285,6 @@ class SettingsDialog(tk.Toplevel):
                             f"\n数据目录：{paths.data_dir()}\n配置：{paths.config_path()}\n日志：{paths.log_file()}",
                   wraplength=660, justify="left").pack(anchor="w", pady=10)
         ttk.Button(tab, text="打开数据目录", command=lambda: self._open_path(str(paths.data_dir()))).pack(anchor="w")
-
-        # ---------------- 底部按钮 ----------------
-        bar = ttk.Frame(self, padding=(10, 0, 10, 10))
-        bar.pack(fill="x")
-        ttk.Button(bar, text="恢复默认", command=self.restore_defaults).pack(side="left")
-        ttk.Button(bar, text="取消", command=self.destroy).pack(side="right")
-        ttk.Button(bar, text="保存", command=self.save).pack(side="right", padx=8)
 
     # ------------------------------------------------------------------ #
     def _pick_file(self, key: str) -> None:
@@ -486,7 +500,7 @@ class SettingsDialog(tk.Toplevel):
                  "run.cloud_for_analysis", "run.cloud_for_variants", "local.auto_start",
                  "local.disable_thinking", "cloud.enabled", "privacy.encrypt_db",
                  "privacy.send_image_to_cloud", "privacy.delete_local_after_cloud",
-                 "archive.write_text", "archive.write_report", "archive.copy_original")
+                 "archive.write_text", "archive.write_report", "archive.copy_original", "ui.animations")
         numbers = {"run.confidence_threshold": float, "run.quality_threshold": float,
                    "run.max_questions_per_image": int, "local.timeout": float,
                    "local.max_image_side": int, "local.jpeg_quality": int,

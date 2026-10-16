@@ -413,7 +413,7 @@ class Image:
         return Image(cw, ch, out)
 
     def rotate(self, angle: float, matte=(255, 255, 255), expand: bool = True) -> "Image":
-        """绕中心旋转（度，逆时针），``expand=True`` 时扩大画布避免切角。"""
+        """绕中心旋转（度，正=顺时针），``expand=True`` 时扩大画布避免切角。"""
         angle = float(angle)
         if abs(angle) < 1e-6:
             return self.copy()
@@ -684,6 +684,8 @@ class Image:
 
     def detect_skew(self, max_angle: float = 8.0, step: float = 0.5) -> float:
         """估计文本倾斜角（度，正=顺时针）。
+
+        返回的是已存在的倾斜，纠正时应调用 ``rotate(-angle)``。
 
         做法（投影剖面法）：把图缩到小尺寸并二值化，只取出「墨迹像素」的坐标；
         对每个候选角度做水平错切，统计每行的墨迹数量，行剖面**方差最大**的角度
@@ -1051,8 +1053,8 @@ def auto_preprocess(img: Image, opts: Optional[dict] = None) -> Tuple[Image, Lis
     if opts.get("deskew", True):
         angle = out.detect_skew()
         if abs(angle) >= 0.6:
-            out = out.rotate(angle)
-            steps.append(f"纠偏 {angle:+.1f}°")
+            out = out.rotate(-angle)
+            steps.append(f"纠偏 {-angle:+.1f}°（检测倾斜 {angle:+.1f}°）")
 
     # 3) 提亮 + 拉对比
     if opts.get("brighten", True):

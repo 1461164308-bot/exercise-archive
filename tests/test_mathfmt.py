@@ -13,6 +13,7 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+import gc
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -400,6 +401,97 @@ class RenderTest(unittest.TestCase):
         self.assertIn(r"\:", _auto_space("x=1"))
         self.assertIn(r"\,", _auto_space("a+b"))
 
+    # ------------------------------------------------------------------ #
+    # 用户报过的另两处渲染 bug：\overline 画成 "overlineA"、\big[ 画成 "big["
+    # ------------------------------------------------------------------ #
+    def _dark(self, img) -> int:
+        """整图深色像素个数（用来判断"多画了一条横线"）。"""
+        return sum(1 for i in range(0, len(img.data), 3) if img.data[i] < 200)
+
+    def _max_run(self, img) -> int:
+        """全图最长的一段**水平连通**墨迹（横线/分数线/上划线都很长，笔画很短）。"""
+        best = 0
+        for y in range(img.h):
+            cur = 0
+            for x in range(img.w):
+                if img.data[(y * img.w + x) * 3] < 200:
+                    cur += 1
+                    best = max(best, cur)
+                else:
+                    cur = 0
+        return best
+
+    def _ink_height(self, img) -> int:
+        """有墨迹的行数（用来判断"括号被放大了一档"）。"""
+        return sum(1 for y in range(img.h)
+                   if any(img.data[(y * img.w + x) * 3] < 200 for x in range(img.w)))
+
+    def test_42_overline_is_a_rule_not_the_command_name(self):
+        r"""``P(\overline{A})`` 要画出**上划线**，不能画成字面 ``P(overlineA)``。
+
+        根因：``\overline`` 不在支持的命令表里，未知命令会回退成字面命令名
+        （``CMD_SYMBOLS.get(value, value)``）。用户在真实错题分析报告里看到
+        ``P(overlineA)``，来源就是这条概率公式。
+        """
+        barred, _ = mathdraw.render_image(r"P(\overline{A})", size_px=26)
+        plain, _ = mathdraw.render_image("P(A)", size_px=26)
+        literal, _ = mathdraw.render_image("P(overlineA)", size_px=26)
+        # 1) 不得退化成字面命令名（那会宽得多）
+        self.assertLess(barred.w, literal.w, r"\overline 又被当成字面文本画出来了")
+        # 2) 上划线不占宽度：应与不带横线的写法同宽
+        self.assertEqual(barred.w, plain.w, "上划线不该改变公式宽度")
+        # 3) 多出一条横线的墨迹，且整体更高（横线在字形上方）
+        self.assertGreater(self._dark(barred), self._dark(plain), "没看到上划线多出的墨迹")
+        self.assertGreater(barred.h, plain.h, "上划线应把盒子撑高")
+
+    def test_43_bar_and_underline_draw_rules(self):
+        r"""``\bar{x}``、``\underline{x}`` 同样要画横线（短横线版本与下划线版本）。"""
+        for latex in (r"\bar{x}", r"\underline{x}"):
+            img, _ = mathdraw.render_image(latex, size_px=26)
+            base, _ = mathdraw.render_image("x", size_px=26)
+            self.assertEqual(img.w, base.w, latex)
+            self.assertGreater(self._max_run(img), self._max_run(base),
+                               "%s 没画出横线" % latex)
+
+    def test_44_big_delimiter_does_not_leak_the_command(self):
+        r"""``\big[`` … ``\big]`` 只把括号放大一档，不能把 "big" 画出来。
+
+        根因同上：``\big``/``\Big``/``\bigl`` 这些**尺寸修饰命令**不被识别，
+        于是 ``\big[\alpha f(x)+\beta g(x)\big]`` 被画成 "big[ … big]"。
+        """
+        fixed, _ = mathdraw.render_image(r"\big[\alpha f(x)\big]", size_px=26)
+        literal, _ = mathdraw.render_image(r"big[\alpha f(x)big]", size_px=26)
+        plain, _ = mathdraw.render_image(r"[\alpha f(x)]", size_px=26)
+        self.assertLess(fixed.w, literal.w, r"\big 又被当成字面文本画出来了")
+        self.assertGreaterEqual(fixed.w, plain.w, "括号不该消失")
+        self.assertGreater(self._ink_height(fixed), self._ink_height(plain),
+                           r"\big 应把括号放大一档")
+        # \Big 比 \big 更大；\bigr) / \Bigl( 这些带 l/r/m 后缀的同样要认
+        big, _ = mathdraw.render_image(r"\Big(x\Big)", size_px=26)
+        plain_paren, _ = mathdraw.render_image("(x)", size_px=26)
+        self.assertGreater(self._ink_height(big), self._ink_height(plain_paren))
+        for latex in (r"\bigl(x\bigr)", r"\Bigl[x\Bigr]", r"\biggm|"):
+            img, _ = mathdraw.render_image(latex, size_px=24)
+            self.assertGreater(self._ink_ratio(img), 0.01, latex)
+
+    def test_45_accent_commands_do_not_leak_names(self):
+        r"""``\vec`` ``\hat`` ``\tilde`` ``\dot`` ``\ddot`` 等也不能泄漏命令名。"""
+        for cmd in ("vec", "hat", "tilde", "dot", "ddot",
+                    "widehat", "widetilde", "overrightarrow"):
+            with_cmd, _ = mathdraw.render_image("\\%s{A}" % cmd, size_px=24)
+            literal, _ = mathdraw.render_image("%sA" % cmd, size_px=24)
+            self.assertLess(with_cmd.w, literal.w, "\\%s 泄漏了命令名" % cmd)
+            self.assertGreater(self._ink_ratio(with_cmd), 0.01, cmd)
+
+    def test_46_real_report_formulas_render_cleanly(self):
+        r"""用户截图里那两条完整式子必须正常渲染（含对立事件与 \big 括号的积分）。"""
+        formulas = [r"P(B) = P(A)P(B|A) + P(\overline{A})P(B|\overline{A})",
+                    r"\int_a^b \big[\alpha f(x) + \beta g(x)\big] dx"]
+        for latex in formulas:
+            img, _ = mathdraw.render_image(latex, size_px=24)
+            self.assertGreater(self._ink_ratio(img), 0.01, f"渲染结果异常：{latex}")
+            self.assertLess(img.w, 420, f"宽度异常（可能又把命令名画进去了）：{latex}")
+
     def test_25_supersample_is_sharper_and_same_size(self):
         """超采样：**墨迹尺寸**基本不变，但抗锯齿层次明显更多（治"小字号发虚"）。
 
@@ -474,6 +566,8 @@ class RichTextMathTest(unittest.TestCase):
             self.root.destroy()
         except Exception:
             pass
+        self.root = None
+        gc.collect()
 
     def test_30_inline_math_becomes_images(self):
         from exerarchive.ui.widgets import RichText

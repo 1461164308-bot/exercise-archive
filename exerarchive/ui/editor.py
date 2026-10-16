@@ -20,6 +20,7 @@ from typing import Callable, List, Optional, Tuple
 from .. import imageops, paths
 from ..logging_setup import get_logger
 from .widgets import COLORS, ImageCanvas, pick_font_family
+from .softui import ScrollableFrame
 
 log = get_logger("ui.editor")
 
@@ -47,13 +48,21 @@ class EditorPanel(ttk.Frame):
         left.pack(side="left", fill="both", expand=True, padx=(8, 4), pady=8)
         self.canvas = ImageCanvas(left, on_select=self._on_select, select_mode=True)
         self.canvas.pack(fill="both", expand=True)
-        self.info = ttk.Label(left, text="从上面的「识别与归档」页选中一张图片，然后点「载入编辑器」",
+        self.info = ttk.Label(left, text="在「导入整理」中选择图片，点击「优化图片」即可载入。",
                               style="Muted.TLabel")
         self.info.pack(anchor="w", pady=(4, 0))
 
-        right = ttk.Frame(self, width=300)
-        right.pack(side="right", fill="y", padx=(4, 8), pady=8)
-        right.pack_propagate(False)
+        control_panel = ttk.Frame(self, width=320)
+        control_panel.pack(side="right", fill="y", padx=(4, 8), pady=8)
+        control_panel.pack_propagate(False)
+        save_bar = ttk.Frame(control_panel)
+        save_bar.pack(side="bottom", fill="x", pady=(10, 0))
+        ttk.Label(save_bar, text="处理满意后，保存供识别使用。", style="Muted.TLabel").pack(anchor="w", pady=(0, 6))
+        self.save_button = ttk.Button(save_bar, text="保存处理结果", style="Primary.TButton", command=self.save_result)
+        self.save_button.pack(fill="x")
+        controls = ScrollableFrame(control_panel)
+        controls.pack(fill="both", expand=True)
+        right = controls.body
 
         ttk.Label(right, text="一键优化", style="Title.TLabel").pack(anchor="w")
         ttk.Button(right, text="✨ 自动纠偏 / 提亮 / 锐化", command=self.auto_enhance).pack(
@@ -106,8 +115,6 @@ class EditorPanel(ttk.Frame):
         ttk.Button(right, text="重新检测", command=self.show_quality).pack(fill="x", pady=2)
         ttk.Separator(right).pack(fill="x", pady=10)
 
-        ttk.Button(right, text="💾 保存处理结果（供识别/归档）", command=self.save_result).pack(
-            fill="x", pady=2)
         ttk.Label(right, text="已执行的处理：", style="Muted.TLabel").pack(anchor="w", pady=(8, 2))
         self.steps_text = tk.Text(right, height=6, wrap="word", relief="flat",
                                   bg=COLORS["panel"], fg=COLORS["muted"], font=(self.family, 9))
@@ -201,10 +208,11 @@ class EditorPanel(ttk.Frame):
         if abs(angle) < 0.3:
             messagebox.showinfo("倾斜检测", "没有检测到明显倾斜（小于 0.3°），无需纠正。")
             return
-        self.image = self.image.rotate(angle)
-        self.steps.append(f"自动纠偏 {angle:+.2f}°")
+        self.image = self.image.rotate(-angle)
+        self.steps.append(f"自动纠偏 {-angle:+.2f}°（检测倾斜 {angle:+.2f}°）")
         self._render()
-        self.info.configure(text=f"已按检测到的 {angle:+.2f}° 纠正倾斜")
+        self.show_quality()
+        self.info.configure(text=f"检测倾斜 {angle:+.2f}°，已反向旋转 {-angle:+.2f}° 纠正")
 
     def auto_enhance(self) -> None:
         if self.image is None:

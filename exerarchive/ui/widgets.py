@@ -16,18 +16,18 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 # 配色（浅色主题）
 COLORS = {
-    "bg": "#f5f6f8",
-    "panel": "#ffffff",
-    "border": "#dfe3ea",
-    "text": "#1c1c1e",
-    "muted": "#6b7280",
-    "primary": "#2f6fed",
-    "primary_dark": "#1f4fbf",
-    "wrong": "#e5484d",
-    "correct": "#2f9e44",
+    "bg": "#edf1f7",
+    "panel": "#f8fafd",
+    "border": "#e0e6ef",
+    "text": "#29364f",
+    "muted": "#748199",
+    "primary": "#687fc1",
+    "primary_dark": "#4e65a5",
+    "wrong": "#bf6979",
+    "correct": "#438573",
     "blank": "#868e96",
-    "warn": "#f59f00",
-    "series": ["#2f6fed", "#e5484d", "#2f9e44", "#f59f00", "#7048e8", "#0ca678", "#e8590c", "#1098ad"],
+    "warn": "#b38b4c",
+    "series": ["#8294ca", "#cb8b99", "#7ba99b", "#c6ac79", "#a49bc9", "#7fb4b1", "#c29d89", "#8ba9be"],
 }
 
 
@@ -56,27 +56,62 @@ def install_style(root: tk.Tk, family: str, size: int = 10) -> ttk.Style:
             style.configure(name, font=base)
         except tk.TclError:
             pass
-    style.configure("TFrame", background=COLORS["bg"])
+    style.configure("TFrame", background=COLORS["panel"])
     style.configure("Panel.TFrame", background=COLORS["panel"], relief="flat")
-    style.configure("TLabel", background=COLORS["bg"], foreground=COLORS["text"])
+    style.configure("TLabel", background=COLORS["panel"], foreground=COLORS["text"])
     style.configure("Panel.TLabel", background=COLORS["panel"], foreground=COLORS["text"])
-    style.configure("Muted.TLabel", background=COLORS["bg"], foreground=COLORS["muted"])
-    style.configure("Title.TLabel", font=(family, size + 5, "bold"), background=COLORS["bg"])
+    style.configure("Muted.TLabel", background=COLORS["panel"], foreground=COLORS["muted"])
+    style.configure("Title.TLabel", font=(family, size + 5, "bold"), background=COLORS["panel"])
     style.configure("Card.TLabel", font=(family, size + 8, "bold"), background=COLORS["panel"],
                     foreground=COLORS["primary"])
-    style.configure("Primary.TButton", font=(family, size, "bold"))
-    style.configure("Treeview", rowheight=int(size * 2.4), fieldbackground=COLORS["panel"],
-                    background=COLORS["panel"])
-    style.configure("Treeview.Heading", font=(family, size, "bold"))
-    style.map("Treeview", background=[("selected", COLORS["primary"])],
-              foreground=[("selected", "white")])
+    style.configure("TButton", padding=(12, 8), relief="flat", borderwidth=0,
+                    background="#edf1f8", foreground=COLORS["text"], focusthickness=1,
+                    focuscolor=COLORS["primary"])
+    style.map("TButton", background=[("active", "#e1e8f6"), ("pressed", "#d5def1")],
+              foreground=[("disabled", "#a5adbb")])
+    style.configure("Primary.TButton", font=(family, size, "bold"),
+                    background=COLORS["primary"], foreground="white")
+    style.map("Primary.TButton", background=[("active", COLORS["primary_dark"])])
+    style.configure("TMenubutton", padding=(10, 8), relief="flat", borderwidth=0,
+                    background="#edf1f8", foreground=COLORS["text"])
+    style.configure("Treeview", rowheight=max(36, int(size * 3.6)), fieldbackground=COLORS["panel"],
+                    background=COLORS["panel"], foreground=COLORS["text"], borderwidth=0,
+                    relief="flat")
+    style.configure("Treeview.Heading", font=(family, size, "bold"), background="#eef2f9",
+                    foreground=COLORS["muted"], relief="flat", padding=(8, 10))
+    style.map("Treeview", background=[("selected", "#e3e9f8")],
+              foreground=[("selected", COLORS["primary_dark"])])
+    style.map("Treeview.Heading", background=[("active", "#e4eaf5")])
+    for name in ("TEntry", "TCombobox", "TSpinbox"):
+        style.configure(name, padding=7, fieldbackground="#ffffff", bordercolor=COLORS["border"],
+                        lightcolor=COLORS["border"], darkcolor=COLORS["border"],
+                        foreground=COLORS["text"], arrowcolor=COLORS["muted"])
+        style.map(name, bordercolor=[("focus", COLORS["primary"])],
+                  fieldbackground=[("readonly", "#ffffff")],
+                  selectbackground=[("!disabled", "#e3e9f8")],
+                  selectforeground=[("!disabled", COLORS["text"])])
+    style.configure("TCheckbutton", background=COLORS["panel"], foreground=COLORS["text"], padding=4)
+    style.configure("TRadiobutton", background=COLORS["panel"], foreground=COLORS["text"], padding=4)
+    style.configure("TPanedwindow", background=COLORS["panel"])
+    style.configure("Vertical.TScrollbar", background="#d9e0ed", troughcolor=COLORS["panel"],
+                    borderwidth=0, arrowsize=12)
     style.configure("TNotebook", background=COLORS["bg"], borderwidth=0)
     style.configure("TNotebook.Tab", padding=(14, 7), font=base)
     style.map("TNotebook.Tab", background=[("selected", COLORS["panel"])])
-    style.configure("TLabelframe", background=COLORS["bg"])
-    style.configure("TLabelframe.Label", background=COLORS["bg"], foreground=COLORS["muted"])
+    style.layout("Workspace.TNotebook", [("Notebook.client", {"sticky": "nswe"})])
+    style.layout("Workspace.TNotebook.Tab", [])
+    style.configure("Workspace.TNotebook", background=COLORS["panel"], borderwidth=0,
+                    bordercolor=COLORS["panel"], lightcolor=COLORS["panel"], darkcolor=COLORS["panel"])
+    style.configure("Treeview", bordercolor=COLORS["panel"], lightcolor=COLORS["panel"],
+                    darkcolor=COLORS["panel"])
+    style.configure("TPanedwindow", borderwidth=0, relief="flat", sashwidth=8,
+                    sashrelief="flat", sashpad=4, background=COLORS["panel"])
+    style.configure("Sash", sashthickness=6, sashrelief="flat", background=COLORS["panel"])
+    style.configure("TLabelframe", background=COLORS["panel"], bordercolor=COLORS["border"])
+    style.configure("TLabelframe.Label", background=COLORS["panel"], foreground=COLORS["muted"])
     style.configure("Status.TLabel", background=COLORS["panel"], foreground=COLORS["muted"])
-    style.configure("Horizontal.TProgressbar", troughcolor="#e9ecf1", background=COLORS["primary"])
+    style.configure("Horizontal.TProgressbar", troughcolor="#e7ecf5", background=COLORS["primary"],
+                    borderwidth=0, thickness=5)
     return style
 
 
@@ -130,7 +165,10 @@ class ImageCanvas(ttk.Frame):
         self._rect_id = None
         self._drag_start = None
         self._select_enabled = select_mode
+        self._max_side = 1000
+        self._resize_job = None
         self.on_select = on_select
+        self.canvas.bind("<Configure>", self._on_resize)
         self.canvas.bind("<ButtonPress-1>", self._on_press)
         self.canvas.bind("<B1-Motion>", self._on_drag)
         self.canvas.bind("<ButtonRelease-1>", self._on_release)
@@ -139,11 +177,16 @@ class ImageCanvas(ttk.Frame):
     def set_image(self, img, max_side: int = 1000, reset_view: bool = True) -> None:
         """显示 imageops.Image（内部按 max_side 缩放以省内存）。"""
         self._image = img
+        self._max_side = max_side
+        self._last_selection = None
         if reset_view:
             self._view = img.scale_to_fit(max_side)
             self._scale = self._view.w / img.w if img.w else 1.0
             self._offset = (0, 0)
-        self._render()
+        if self.canvas.winfo_width() > 24 and self.canvas.winfo_height() > 24:
+            self._fit_canvas()
+        else:
+            self._render()
 
     def _render(self) -> None:
         if self._image is None:
@@ -154,24 +197,57 @@ class ImageCanvas(ttk.Frame):
         self._photo = make_photo(view)
         self.canvas.delete("all")
         self._rect_id = None
-        self.canvas.create_image(0, 0, anchor="nw", image=self._photo)
+        cw, ch = self.canvas.winfo_width(), self.canvas.winfo_height()
+        self._offset = (max(0, (cw-view.w)//2), max(0, (ch-view.h)//2))
+        self.canvas.create_image(*self._offset, anchor="nw", image=self._photo)
         self.canvas.configure(scrollregion=(0, 0, view.w, view.h))
         if self._select_enabled:
             self.canvas.create_text(8, 8, anchor="nw", fill="#666", font=("", 9),
                                     text="拖拽可框选区域（裁剪 / 去水印）")
+
+    def _on_resize(self, _event):
+        if self._resize_job:
+            self.after_cancel(self._resize_job)
+        self._resize_job = self.after(90, self._fit_canvas)
+
+    def _fit_canvas(self):
+        self._resize_job = None
+        if self._image is None:
+            return
+        img = self._image
+        cw, ch = self.canvas.winfo_width()-24, self.canvas.winfo_height()-24
+        if cw < 24 or ch < 24:
+            return
+        scale = min(1, cw/img.w, ch/img.h, self._max_side/max(img.w, img.h))
+        self._view = img.resize(max(1, round(img.w*scale)), max(1, round(img.h*scale)))
+        self._scale = self._view.w/img.w
+        self._last_selection = None
+        self._render()
 
     def clear(self) -> None:
         self.canvas.delete("all")
         self._photo = None
         self._image = None
         self._view = None
+        self._last_selection = None
+
+    def destroy(self):
+        # PhotoImage destruction must happen on the Tk thread, not in a later worker GC.
+        if self._resize_job:
+            self.after_cancel(self._resize_job)
+            self._resize_job = None
+        self._photo = None
+        self._image = None
+        super().destroy()
 
     # -- 坐标换算 ---------------------------------------------------------- #
     def _to_image_coords(self, x: int, y: int) -> Tuple[int, int]:
         view = getattr(self, "_view", None)
         if view is None or self._scale <= 0:
             return x, y
-        return int(x / self._scale), int(y / self._scale)
+        img = self._image
+        ix, iy = int((x-self._offset[0]) / self._scale), int((y-self._offset[1]) / self._scale)
+        return max(0, min(img.w, ix)), max(0, min(img.h, iy))
 
     def get_selection(self) -> Optional[Tuple[int, int, int, int]]:
         """返回上一次框选的区域（原图坐标系）。"""
@@ -220,17 +296,32 @@ class ChartCanvas(tk.Canvas):
 
     def __init__(self, master, width: int = 380, height: int = 220, bg: str = COLORS["panel"], **kw):
         super().__init__(master, width=width, height=height, bg=bg, highlightthickness=0, **kw)
+        self._chart_spec = None
+        self._resize_job = None
+        self.bind("<Configure>", self._resize_chart)
+
+    def _resize_chart(self, _event):
+        if self._resize_job:
+            self.after_cancel(self._resize_job)
+        self._resize_job = self.after(80, self._redraw_chart)
+
+    def _redraw_chart(self):
+        self._resize_job = None
+        if self._chart_spec:
+            kind, args, kw = self._chart_spec
+            getattr(self, kind)(*args, **kw)
 
     def draw_pie(self, data: Dict[str, float], title: str = "") -> None:
+        self._chart_spec = ("draw_pie", (data, title), {})
         self.delete("all")
-        w = int(self["width"])
-        h = int(self["height"])
+        w = self.winfo_width() if self.winfo_width() > 1 else int(self["width"])
+        h = self.winfo_height() if self.winfo_height() > 1 else int(self["height"])
         items = [(k, float(v)) for k, v in (data or {}).items() if float(v) > 0]
         if not items:
             self.create_text(w / 2, h / 2, text="暂无数据", fill=COLORS["muted"])
             return
         total = sum(v for _, v in items) or 1.0
-        size = min(w, h) - 60
+        size = max(70, min(w-140, h) - 60)
         x0, y0 = 20, 30
         start = 90.0
         for i, (name, val) in enumerate(items):
@@ -262,9 +353,11 @@ class ChartCanvas(tk.Canvas):
 
     def draw_bars(self, data: Dict[str, float], title: str = "", max_items: int = 10,
                   color: str = None, value_suffix: str = "") -> None:
+        self._chart_spec = ("draw_bars", (data, title), {"max_items": max_items, "color": color,
+                                                        "value_suffix": value_suffix})
         self.delete("all")
-        w = int(self["width"])
-        h = int(self["height"])
+        w = self.winfo_width() if self.winfo_width() > 1 else int(self["width"])
+        h = self.winfo_height() if self.winfo_height() > 1 else int(self["height"])
         items = [(str(k), float(v)) for k, v in (data or {}).items() if float(v) > 0]
         items.sort(key=lambda kv: -kv[1])
         items = items[:max_items]
@@ -292,23 +385,32 @@ class ChartCanvas(tk.Canvas):
                              text=f"{int(val)}{value_suffix}", fill=COLORS["muted"])
 
 
-class StatCard(ttk.Frame):
+class StatCard(tk.Canvas):
     """统计卡片：一个大数字 + 说明文字。"""
 
     def __init__(self, master, label: str, value: str = "0", color: str = None):
-        super().__init__(master, style="Panel.TFrame", padding=(14, 10))
+        super().__init__(master, width=110, height=108, bg=COLORS["panel"], highlightthickness=0)
         self._label = label
+        self._color = color or COLORS["primary"]
         self.value_var = tk.StringVar(value=value)
-        self.value_label = tk.Label(self, textvariable=self.value_var, bg=COLORS["panel"],
-                                    fg=color or COLORS["primary"], font=("", 20, "bold"))
-        self.value_label.pack(anchor="w")
-        tk.Label(self, text=label, bg=COLORS["panel"], fg=COLORS["muted"],
-                 font=("", 9)).pack(anchor="w")
+        self.bind("<Configure>", lambda _: self._draw())
+        self.value_var.trace_add("write", lambda *_: self._draw())
+
+    def _draw(self):
+        from .softui import blend, rounded
+        self.delete("all")
+        w, h = self.winfo_width(), self.winfo_height()
+        rounded(self, 0, 0, w, h, 16, fill=blend(COLORS["panel"], self._color, .075), outline="")
+        family = getattr(self.winfo_toplevel(), "family", "")
+        self.create_text(16, 39, anchor="w", text=self.value_var.get(), fill=self._color,
+                         font=(family, 25, "bold"))
+        self.create_text(16, 77, anchor="w", text=self._label, fill=COLORS["muted"], font=(family, 9))
 
     def set(self, value, color: str = None) -> None:
         self.value_var.set(str(value))
         if color:
-            self.value_label.configure(fg=color)
+            self._color = color
+            self._draw()
 
 
 # --------------------------------------------------------------------------- #
@@ -379,6 +481,10 @@ class RichText(ttk.Frame):
         self._photos: List[tk.PhotoImage] = []      # 内嵌公式图必须持有引用
         self._plain_parts: List[str] = []           # 原始文本（公式仍是 LaTeX 源码）
         self.text.configure(state="disabled")
+
+    def destroy(self):
+        self._photos.clear()
+        super().destroy()
 
     def clear(self) -> None:
         self.text.configure(state="normal")
@@ -570,6 +676,21 @@ class StatusBar(ttk.Frame):
         ttk.Label(self, textvariable=self.detail, style="Status.TLabel").pack(side="right")
         self.progress = ttk.Progressbar(self, mode="determinate", maximum=100, length=180)
         self.progress.pack(side="right", padx=10)
+        self._progress_job = None
+
+    def start_activity(self, message="处理中…") -> None:
+        self.stop_activity()
+        self.msg.set(message)
+        self.progress.configure(mode="indeterminate")
+        if getattr(self.winfo_toplevel(), "animations_enabled", True):
+            self.progress.start(24)
+
+    def stop_activity(self) -> None:
+        if self._progress_job:
+            self.after_cancel(self._progress_job)
+            self._progress_job = None
+        self.progress.stop()
+        self.progress.configure(mode="determinate", value=0)
 
     def set(self, message: str, detail: str = "") -> None:
         self.msg.set(message)
@@ -578,7 +699,20 @@ class StatusBar(ttk.Frame):
 
     def set_progress(self, done: int, total: int, message: str = "") -> None:
         total = max(1, total)
-        self.progress.configure(value=min(100, done * 100.0 / total))
+        self.progress.stop()
+        self.progress.configure(mode="determinate")
+        if self._progress_job:
+            self.after_cancel(self._progress_job)
+        start = float(self.progress["value"])
+        target = min(100, done * 100.0 / total)
+        animate = getattr(self.winfo_toplevel(), "animations_enabled", True)
+        def tick(frame=1):
+            self._progress_job = None
+            t = 1-(1-frame/10)**3 if animate else 1
+            self.progress.configure(value=start+(target-start)*t)
+            if animate and frame < 10:
+                self._progress_job = self.after(16, tick, frame+1)
+        tick()
         if message:
             self.msg.set(message)
         self.detail.set(f"{done}/{total}")

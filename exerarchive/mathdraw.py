@@ -424,6 +424,30 @@ _BIGOP_GROW = 1.30
 # 紧跟在这些字符后面时，函数名不需要补细空格（``\lim_{x\to 0}``、``\sin^2 x``）
 _NO_SPACE_AFTER_OP = set("^_}]),;:")
 
+# 上划线 / 下划线类命令：``\overline{AB}``、``\bar{A}``、``\underline{x}``。
+# 不支持时会被当成未知命令、**把命令名本身画出来** —— 实际遇到过
+# ``P(\overline{A})`` 被画成 "P(overlineA)"（概率题里的对立事件）。
+_OVERLINE_CMDS = {"overline", "bar"}
+_UNDERLINE_CMDS = {"underline"}
+# 重音类命令：标记排在内容正上方（矢量箭头、帽子、波浪线、点）
+_ACCENT_CMDS = {
+    "vec": "→", "overrightarrow": "→",
+    "hat": "^", "widehat": "^",
+    "tilde": "~", "widetilde": "~",
+    "dot": "˙", "ddot": "¨",
+}
+# 尺寸修饰命令：``\big[``、``\Bigl(``、``\biggr\}`` 只是把紧跟的那个括号放大一档，
+# 自己**不产生任何内容**。不支持就会把 "big" 三个字母画在括号前面（实际遇到过
+# ``\big[\alpha f(x)+\beta g(x)\big]`` 被画成 "big[ … big]"）。
+_SIZE_MOD_CMDS = {
+    "big": 1.15, "Big": 1.30, "bigg": 1.45, "Bigg": 1.60,
+    "bigl": 1.15, "Bigl": 1.30, "biggl": 1.45, "Biggl": 1.60,
+    "bigr": 1.15, "Bigr": 1.30, "biggr": 1.45, "Biggr": 1.60,
+    "bigm": 1.15, "Bigm": 1.30, "biggm": 1.45, "Biggm": 1.60,
+}
+# 尺寸修饰后面跟着这些字符时才算"定界符"，值得放大（``\big/``、``\big|`` 也常见）
+_SIZE_MOD_TARGETS = "([{|/<"
+
 
 def _auto_space(latex: str) -> str:
     """给运算符两侧补上数学间距（LaTeX 会自动做，我们得自己来）。
@@ -715,9 +739,32 @@ class Renderer:
                 else:
                     atoms.append(self.plain("√", size))
                     i += 1
-            elif kind == "cmd" and value in ("left", "right", "displaystyle",
-                                             "textstyle", "limits", "nolimits"):
+            elif kind == "cmd" and value in ("left", "right", "middle", "displaystyle",
+                                             "textstyle", "scriptstyle", "scriptscriptstyle",
+                                             "limits", "nolimits"):
                 i += 1
+            elif kind == "cmd" and (value in _OVERLINE_CMDS or value in _UNDERLINE_CMDS):
+                # \overline{AB} / \bar A / \underline{x}：给内容加一条横线
+                arg, i = self._script_arg(toks, i + 1)
+                body = self.layout(arg, size) if arg else self.plain("", size)
+                atoms.append(self.ruled(
+                    body, size, "overline" if value in _OVERLINE_CMDS else "underline"))
+            elif kind == "cmd" and value in _ACCENT_CMDS:
+                # \vec{a} / \hat{x} / \tilde{y}：标记排在内容正上方
+                arg, i = self._script_arg(toks, i + 1)
+                body = self.layout(arg, size) if arg else self.plain("", size)
+                atoms.append(self.accent(body, size, _ACCENT_CMDS[value]))
+            elif kind == "cmd" and value in _SIZE_MOD_CMDS:
+                # \big[ → 放大一档的 "["；后面不是定界符就整个丢掉（命令本身不产生内容）
+                scale = _SIZE_MOD_CMDS[value]
+                if nxt and nxt[0] == "text" and nxt[1][:1] in _SIZE_MOD_TARGETS:
+                    atoms.append(self.plain(nxt[1][0], max(size + 1, int(round(size * scale)))))
+                    rest = nxt[1][1:]
+                    if rest:
+                        atoms.append(self.plain(rest, size))
+                    i += 2
+                else:
+                    i += 1
             elif kind == "cmd" and value in ("text", "mathrm", "mathbf", "mathit",
                                              "operatorname", "mbox", "boxed", "textbf"):
                 if nxt and nxt[0] == "group":
@@ -799,6 +846,31 @@ class Renderer:
 
     def scripted(self, base: str, sup, sub_, size: int) -> dict:
         return self.script_box(self.plain(base, size), sup, sub_, size)
+
+    def ruled(self, body: dict, size: int, mode: str) -> dict:
+        """给任意原子加一条横线：``overline``（上划线）/ ``underline``（下划线）。
+
+        概率题里的对立事件 ``\\overline{A}`` 就靠它 —— 以前这个命令不被识别，
+        会把 "overline" 当文字画出来（``P(\\overline{A})`` → "P(overlineA)"）。
+        """
+        bar = max(1, int(round(size * 0.07)))
+        gap = max(1, int(round(size * 0.13)))
+        above, below = body["above"], body["below"]
+        if mode == "overline":
+            above = body["above"] + gap + bar
+        else:
+            below = body["below"] + gap + bar
+        return {"kind": mode, "body": body, "bar": bar, "gap": gap,
+                "width": max(1, body["width"]), "above": above, "below": below, "size": size}
+
+    def accent(self, body: dict, size: int, mark: str) -> dict:
+        """给原子加重音（``\\vec`` / ``\\hat`` / ``\\tilde`` / ``\\dot``）：标记居中排在内容正上方。"""
+        mark_box = self.plain(mark, max(6, int(round(size * 0.62))))
+        gap = max(0, int(round(size * 0.06)))
+        return {"kind": "accent", "body": body, "mark": mark_box, "gap": gap,
+                "width": max(body["width"], mark_box["width"]),
+                "above": body["above"] + gap + mark_box["above"],
+                "below": body["below"], "size": size}
 
     def limits_box(self, base_box: dict, sup, sub_, size: int) -> dict:
         """把上/下限排在算符的**正上方、正下方**（求和、连乘、lim 这类大算符的教科书写法）。
@@ -971,6 +1043,22 @@ class Renderer:
                 self.draw(sub_, x + dx, baseline + drop)
                 x += dx + sub_["width"]
             return x
+        if kind in ("overline", "underline"):
+            # 横线画在盒子的最上/最下沿，内容仍按同一基线绘制（线宽与分数线一致）
+            body = box["body"]
+            if kind == "overline":
+                y = baseline - box["above"]
+            else:
+                y = baseline + body["below"] + box["gap"]
+            self.c.hline(x, x + box["width"] - 1, y, box["bar"])
+            self.draw(body, x, baseline)
+            return x + box["width"]
+        if kind == "accent":
+            body, mark = box["body"], box["mark"]
+            self.draw(body, x + (box["width"] - body["width"]) // 2, baseline)
+            self.draw(mark, x + (box["width"] - mark["width"]) // 2,
+                      baseline - body["above"] - box["gap"])
+            return x + box["width"]
         if kind == "bigop":
             # 大算符：上下限居中排在正上方/正下方（见 limits_box）
             base, sup, sub_ = box["base"], box["sup"], box["sub"]

@@ -93,6 +93,7 @@ DEFAULTS: Dict[str, Any] = {
         "thumb_size": 180,
         "window": "",
         "show_log_panel": False,
+        "animations": True,                      # 按钮悬停与导航过渡，可在设置中关闭
         "image_display_max": 1200,               # 预览区图片最长边
         "math_scale": 1.15,                      # 报告里公式相对正文行高的倍率（1.0~1.6 比较合适）
         "math_supersample": 3,                   # 公式渲染超采样倍数（越大越清晰、越慢）
@@ -131,6 +132,9 @@ class Config:
 
     def __init__(self, data: Optional[Dict[str, Any]] = None, path: Optional[Path] = None):
         self._data = _deep_merge(DEFAULTS, data or {})
+        # 清掉历史遗留的"影子键"（顶层带点号的键）：get() 从不读它们，
+        # 是旧版 update() 的 bug 写进去的（见 update 的说明），留着只会让配置文件自相矛盾。
+        self._data = {key: value for key, value in self._data.items() if "." not in key}
         self._path = Path(path) if path else paths.config_path()
 
     # -- 读写 -------------------------------------------------------------- #
@@ -185,7 +189,24 @@ class Config:
         return copy.deepcopy(self._data)
 
     def update(self, patch: Dict[str, Any]) -> None:
-        self._data = _deep_merge(self._data, patch)
+        """合并配置补丁：**点号键按路径写入**，其余键做递归字典合并。
+
+        ``{"run.auto_analyze": False}`` 等价于 ``set("run.auto_analyze", False)``；
+        嵌套字典（如 ``DEFAULTS``）仍按原来的递归方式合并。
+
+        以前这里一律交给 :func:`_deep_merge`：扁平点号键会被当成**普通键**塞进顶层，
+        于是配置文件里长出一堆 ``"run.confidence_threshold": 0.5`` 这样的"影子键" ——
+        而 :meth:`get` 读的是嵌套段 ``run.confidence_threshold``，两者互不相干。
+        后果是设置窗口里点了「保存」（日志还写着"设置已保存"）却**一点都不生效**，
+        用户反馈的「设置中改换设置无保存选项，无法正常改设置」正是它。
+        """
+        patch = patch or {}
+        nested = {key: value for key, value in patch.items() if "." not in key}
+        if nested:
+            self._data = _deep_merge(self._data, nested)
+        for key, value in patch.items():
+            if "." in key:
+                self.set(key, value)
 
     # -- 便捷属性 ---------------------------------------------------------- #
     @property

@@ -254,6 +254,26 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(out.questions[0]["status"], "blank")
         self.assertTrue(out.questions[0].get("status_guessed"))
 
+    def test_17_cloud_first_without_key_blames_cloud_not_local(self):
+        """只想用云端、但云端没配好时，提示必须指向**云端**。
+
+        目标读者是"没有显卡 / 不想装本地模型"的用户：他们选了「云端优先」却没填
+        API Key 时，如果只看到「本地模型服务不可用」，会以为是自己电脑缺东西。
+        """
+        logs = []
+        cfg = make_cfg(**{"run.mode": "cloud_first", "cloud.enabled": True,
+                          "cloud.profiles": [{"name": "t", "base_url": "https://x/v1",
+                                              "model": "m", "api_key": ""}]})
+        self.assertFalse(cfg.cloud_enabled(), "没填 Key 时 cloud_enabled 应为 False")
+        with mock.patch("exerarchive.pipeline.ModelClient",
+                        side_effect=lambda target, cfg_: FakeClient(target, cfg_, {"local": ""})):
+            pipe = Pipeline(cfg, on_log=logs.append)
+        out = pipe.process_image(self.img)
+        self.assertFalse(out.questions)
+        self.assertIn("云端", out.error, "错误信息应当说明是云端没配好：%r" % out.error)
+        self.assertIn("设置", out.error, "错误信息要给出下一步动作：%r" % out.error)
+        self.assertTrue(any("云端当前不可用" in line for line in logs), logs)
+
 
 class AnalysisTest(unittest.TestCase):
     def _q(self, **over):

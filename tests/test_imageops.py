@@ -7,6 +7,8 @@ import math
 import os
 import sys
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -182,6 +184,43 @@ class ImageTest(unittest.TestCase):
         tilted = img.rotate(5.0)
         got = tilted.detect_skew()
         self.assertAlmostEqual(got, 5.0, delta=1.0)
+
+    def _text_page(self):
+        img = make_image(900, 700)
+        for row in range(6):
+            draw_marks(img, [(60, 60+row*100, 840, 72+row*100)], (30, 30, 30))
+        return img
+
+    def test_deskew_pipeline_reduces_tilt_in_both_directions(self):
+        for angle in (4.0, -6.0, 7.0):
+            with self.subTest(angle=angle):
+                tilted = self._text_page().rotate(angle)
+                corrected, steps = imageops.auto_preprocess(tilted, {
+                    'deskew': True, 'brighten': False, 'sharpen': False, 'max_side': 2000})
+                residual = corrected.detect_skew()
+                self.assertLess(abs(residual), .8, f'{angle}° correction left {residual}°')
+                self.assertTrue(any('纠偏' in step for step in steps))
+                repeated, steps = imageops.auto_preprocess(corrected, {
+                    'deskew': True, 'brighten': False, 'sharpen': False, 'max_side': 2000})
+                self.assertEqual(repeated.size, corrected.size)
+                self.assertFalse(any('纠偏' in step for step in steps))
+
+    def test_editor_auto_deskew_reduces_tilt(self):
+        from exerarchive.ui.editor import EditorPanel
+        for angle in (5.0, -4.0):
+            editor = SimpleNamespace(image=self._text_page().rotate(angle), steps=[],
+                                     _render=Mock(), show_quality=Mock(), info=Mock())
+            EditorPanel.auto_deskew(editor)
+            self.assertLess(abs(editor.image.detect_skew()), .8)
+            editor._render.assert_called_once()
+            editor.show_quality.assert_called_once()
+
+    def test_deskew_with_pure_python_rotation(self):
+        with patch.object(gdiplus, 'available', return_value=False):
+            tilted = self._text_page().rotate(-3.0)
+            corrected, _ = imageops.auto_preprocess(tilted, {
+                'deskew': True, 'brighten': False, 'sharpen': False, 'max_side': 2000})
+            self.assertLess(abs(corrected.detect_skew()), .8)
 
     def test_13_remove_watermark_modes(self):
         # 1) 压住文字的黑块：white / inpaint 应当用周边纸色把它抹掉

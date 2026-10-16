@@ -12,6 +12,7 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+import gc
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -95,6 +96,8 @@ class PhotoImageTest(unittest.TestCase):
             self.root.destroy()
         except Exception:
             pass
+        self.root = None
+        gc.collect()
 
     def _img(self, w=300, h=200):
         from exerarchive import imageops

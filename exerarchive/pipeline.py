@@ -312,6 +312,12 @@ class Pipeline:
         cloud_norm: Dict = {}
 
         want_cloud_first = mode == "cloud_first" and self.cloud_usable()
+        if mode == "cloud_first" and not want_cloud_first:
+            # 面向"只想用云端、本机没有本地模型"的用户：这时如果只报「本地模型服务不可用」，
+            # 他们会以为是自己电脑缺东西，其实是云端还没配好。先把原因说清楚。
+            self.log("「云端优先」已选中，但云端当前不可用（没填 API Key，或没勾「启用云端增强」）——"
+                     "会退回本地识别；本机若没装本地模型，就会识别失败。"
+                     "请到「设置 → 云端模型」填好 Key 并勾选启用后重试。")
 
         # 2) 云端优先
         if want_cloud_first:
@@ -385,6 +391,10 @@ class Pipeline:
                 or (local_res.error if local_res and not local_res.ok else "")
                 or "没有识别出任何题目"
             )
+            if mode == "cloud_first" and not want_cloud_first:
+                # 别让"只想用云端"的用户看到一句「本地模型服务不可用」却不知道该怎么办
+                out.error += "（当前是「云端优先」模式，但云端未配置：请在「设置 → 云端模型」" \
+                             "填好 API Key 并勾选「启用云端增强」）"
             out.confidence = 0.0
         out.elapsed = time.time() - t0
         self.log(f"识别完成：{out.summary()}（用时 {out.elapsed:.1f}s）")
