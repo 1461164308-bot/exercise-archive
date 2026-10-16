@@ -11,7 +11,7 @@
 
 ## ⚠️ 先看这一条：压缩包**自带 Python，但不含 AI 模型**
 
-便携版（Releases 里的 `AI错题本-便携版-*.zip`）已经把 **Python 运行时**打进去了 ——
+便携版（Releases 里的 `exercise-archive-portable-*.zip`）已经把 **Python 运行时**打进去了 ——
 **目标电脑不需要装 Python、也不需要命令行**。但它**不包含任何 AI 模型**：模型动辄几 GB，
 而且该用哪个取决于你的电脑和预算，所以必须由你选一条：
 
