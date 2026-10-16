@@ -526,6 +526,56 @@ class ExperienceTest(unittest.TestCase):
         finally:
             panel.destroy()
 
+    # -- 8. 开箱即用：没装本地模型时必须引导去配云端 ---------------------- #
+    def test_first_run_without_local_model_guides_to_cloud(self):
+        """在"没装 ollama、也没配云端"的机器上，首页必须明确引导，不能只报"未就绪"。
+
+        便携版自带 Python 运行时但**不含 AI 模型**，这是绝大多数用户第一次打开时的处境：
+        此时要给出去哪儿填 API Key、勾哪个框、推荐哪家（有免费额度），否则用户会以为软件坏了。
+        """
+        # 云端未配置 + 本地不可用
+        self.app.cfg.update({"cloud.enabled": False, "run.mode": "hybrid"})
+        self.app._local_ready = False
+        hint = self.app._first_run_hint()
+        self.assertTrue(hint, "没装本地模型又没配云端时，必须给出引导")
+        for key in ("设置", "云端模型", "API Key", "该模型支持图片"):
+            self.assertIn(key, hint, "引导里缺少关键信息：%s\n%s" % (key, hint))
+        self.assertIn("dashscope.aliyuncs.com", hint, "应给出推荐服务商的 Base URL")
+
+        # 首页面板真的显示出来，并且有「去配置云端模型」按钮
+        self.app._refresh_first_run_hint()
+        self.flush(0.4)
+        self.assertEqual(self.app.welcome.hint_text, hint)
+        self.assertIsNotNone(self.app.welcome.setup_button, "缺少一键去配置的按钮")
+        self.app.welcome.setup_button.invoke()
+        self.flush(0.6)
+        tops = [w for w in self.app.winfo_children() if w.winfo_class() == "Toplevel"]
+        self.assertTrue(tops, "点「去配置云端模型」应打开设置窗口")
+        for w in tops:
+            w.destroy()
+        self.flush(0.3)
+
+        # 状态栏也要说清下一步，而不是只报"未就绪"
+        self.app._drain_queue()
+        self.app._post(("local_ready", False))
+        self.flush(0.5)
+        self.assertIn("云端模型", self.app.status.msg.get())
+
+        # 配好云端后引导必须消失
+        self._cloud_first_cfg()
+        self.assertEqual(self.app._first_run_hint(), "")
+        self.app._refresh_first_run_hint()
+        self.flush(0.3)
+        self.assertEqual(self.app.welcome.hint_text, "")
+
+    def test_first_run_hint_stays_quiet_when_local_model_works(self):
+        """本地模型可用时不要拿"去配云端"打扰用户。"""
+        self.app.cfg.update({"cloud.enabled": False})
+        self.app._local_ready = True
+        self.assertEqual(self.app._first_run_hint(), "")
+        self.app._local_ready = None       # 还没探测完 → 也不提示
+        self.assertEqual(self.app._first_run_hint(), "")
+
 
 if __name__ == "__main__":
     unittest.main()

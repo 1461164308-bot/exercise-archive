@@ -209,17 +209,46 @@ class ScrollableFrame(ttk.Frame):
 
 
 class WelcomePanel(tk.Canvas):
-    """Real empty state with one action and a small paper illustration."""
-    def __init__(self, master, on_import):
+    """Real empty state with one action and a small paper illustration.
+
+    ``on_setup`` 可选：首次使用引导用。没装本地模型又没配云端时，多显示一行醒目提示
+    和一个「去配置云端模型」按钮 —— 否则用户看到"服务未就绪"会以为软件坏了。
+    """
+    def __init__(self, master, on_import, on_setup=None):
         super().__init__(master, bg=COLORS["panel"], highlightthickness=0)
+        self.hint_text = ""
         self.button = SoftButton(self, text="＋  导入习题图片", command=on_import, primary=True,
                                  width=184, height=44)
         self._button_id = self.create_window(0, 0, window=self.button)
+        self.setup_button = None
+        self._setup_id = None
+        if on_setup is not None:
+            self.setup_button = SoftButton(self, text="去配置云端模型", command=on_setup,
+                                           width=184, height=38, quiet=True)
+            self._setup_id = self.create_window(0, 0, window=self.setup_button)
         self.bind("<Configure>", self._draw)
 
-    def _draw(self, event):
+    def set_hint(self, text: str) -> None:
+        """设置/清除首次使用提示（空字符串=不显示，也不显示配置按钮）。"""
+        text = text or ""
+        if text == self.hint_text:
+            return
+        self.hint_text = text
+        self._draw_safe()
+
+    def _draw_safe(self) -> None:
+        try:
+            self._draw_full(self.winfo_width(), self.winfo_height())
+        except Exception:
+            pass
+
+    def _draw(self, event=None):
+        w = event.width if event is not None else self.winfo_width()
+        h = event.height if event is not None else self.winfo_height()
+        self._draw_full(w, h)
+
+    def _draw_full(self, w, h):
         self.delete("art")
-        w, h = event.width, event.height
         cx, cy = w/2, max(98, h*.32)
         for i in range(18, 0, -1):
             r = 65+i*3
@@ -237,10 +266,26 @@ class WelcomePanel(tk.Canvas):
                          font=(family, 20, "bold"), tags="art")
         self.create_text(cx, cy+144, text="拍照导入，自动识别，轻松整理每一道错题。", fill=COLORS["muted"],
                          font=(family, 10), tags="art")
-        self.coords(self._button_id, cx, cy+197)
-        self.create_text(cx, cy+242, text="支持 JPG / PNG 等图片 · 可一次选择多张", fill=COLORS["muted"],
-                         font=(family, 9), tags="art")
-        if h > 500:
+        if self.hint_text:
+            # 首次使用引导：醒目颜色 + 自动换行，并把按钮整体下移，避免与提示重叠
+            self.create_text(cx, cy+178, text=self.hint_text, fill=COLORS["primary_dark"],
+                             font=(family, 10), width=max(280, w-140), justify="center", tags="art")
+            hint_lines = 1 + len(self.hint_text) // 42
+            base = cy + 178 + hint_lines * 20
+            self.coords(self._button_id, cx, base + 34)
+            if self._setup_id is not None:
+                self.coords(self._setup_id, cx, base + 84)
+            self.create_text(cx, base + 122, text="也可以安装 Ollama 用本地模型完全离线（见 docs/07）",
+                             fill=COLORS["muted"], font=(family, 9), tags="art")
+        else:
+            self.coords(self._button_id, cx, cy+197)
+            if self._setup_id is not None:
+                self.itemconfigure(self._setup_id, state="hidden")
+            self.create_text(cx, cy+242, text="支持 JPG / PNG 等图片 · 可一次选择多张", fill=COLORS["muted"],
+                             font=(family, 9), tags="art")
+        if self.hint_text and self._setup_id is not None:
+            self.itemconfigure(self._setup_id, state="normal")
+        if h > 560 and not self.hint_text:
             self.create_text(cx, h-48, text="01  导入图片       →       02  开始识别       →       03  整理与复习",
                              fill="#8693aa", font=(family, 10), tags="art")
         self.tag_lower("art")

@@ -91,6 +91,7 @@ class MainWindow(tk.Tk):
         self._task_tick_job = None
         self._completion_notice = ""
         self._engines_used: List[str] = []      # 本次任务里每张图实际用的引擎（云端优先时用来看"到底谁干的"）
+        self._local_ready: Optional[bool] = None   # 本地模型服务可用？None=还没探测
         self._editing_question = False
         self._loaded_form_uid = ""
 
@@ -145,20 +146,43 @@ class MainWindow(tk.Tk):
         if cloud_only:
             # 云端优先且云端已配好：没必要再去拉本地模型（省内存，也免得弹出"本地模型未就绪"让人误会）
             self.log("当前为「云端优先」且云端已配置，本次启动不拉起本地模型服务")
-        elif self.cfg.get("local.auto_start", True):
+        else:
+            # 探测本地模型是否可用（后台线程，不阻塞界面）。即便关了自动启动也要探一次：
+            # 探测失败时首页会给出"去配云端模型"的引导，而不是让人对着"未就绪"发呆。
             threading.Thread(target=self._ensure_model_async, daemon=True).start()
+        self._refresh_first_run_hint()
 
     def _ensure_model_async(self) -> None:
         try:
             ok = ModelClient("local", self.cfg).manager.ensure_running(on_log=self._log_threadsafe)
-            if ok:
-                self._post(("status", "本地模型服务已就绪"))
-            elif self.cfg.mode() == "cloud_first":
-                self._post(("status", "云端优先模式：本地模型服务未就绪（不影响识别，识别走云端）"))
-            else:
-                self._post(("status", "本地模型服务未就绪（可在设置里检查）"))
         except Exception as exc:
             self._log_threadsafe(f"启动本地模型服务失败：{exc}")
+            ok = False
+        # 让界面按"本地到底能不能用"来显示引导（线程里不碰 Tk，交给队列处理）
+        self._post(("local_ready", bool(ok)))
+
+    def _first_run_hint(self) -> str:
+        """首次使用该去哪配模型。
+
+        面向"没装本地模型、也没配云端"的用户：此时软件什么也识别不了，
+        必须明确告诉他去哪儿填 API Key —— 只说"服务未就绪"会让人以为软件坏了。
+        """
+        if self._local_ready is not False:      # 还不知道 / 本地可用 → 不打扰
+            return ""
+        if self.cfg.cloud_enabled():            # 云端已配好 → 不用引导
+            return ""
+        return ("第一次使用：请点右上角「设置 → 云端模型」，填好 Base URL、模型名与 API Key，"
+                "并勾选「该模型支持图片」。推荐阿里通义千问（有免费额度，"
+                "Base URL 填 https://dashscope.aliyuncs.com/compatible-mode/v1，模型填 qwen-vl-max）。")
+
+    def _refresh_first_run_hint(self) -> None:
+        hint = self._first_run_hint()
+        try:
+            self.welcome.set_hint(hint)
+        except Exception:
+            pass
+        if hint:
+            self.log("未检测到可用的模型：本地服务未就绪且云端未配置 —— 已在首页给出配置指引")
 
     # ------------------------------------------------------------------ #
     # 界面搭建
@@ -393,7 +417,8 @@ class MainWindow(tk.Tk):
         self.result_paned.pack(fill="both", expand=True)
         self.preview_frame = ttk.Frame(self.result_paned)
         self.result_paned.add(self.preview_frame, weight=3)
-        self.welcome = WelcomePanel(self.preview_frame, self.import_images)
+        self.welcome = WelcomePanel(self.preview_frame, self.import_images,
+                                    on_setup=self.open_settings)
         self.welcome.pack(fill="both", expand=True)
         self.preview = ImageCanvas(self.preview_frame, bg="#eef2f8")
         self.preview_info = ttk.Label(self.preview_frame, text="选择一张图片，查看预览", style="Muted.TLabel")
@@ -801,6 +826,19 @@ class MainWindow(tk.Tk):
                 elif kind == "progress":
                     _, done, total, text = msg
                     self.status.set_progress(done, total, text)
+                elif kind == "local_ready":
+                    ok = bool(msg[1])
+                    self._local_ready = ok
+                    if ok:
+                        self.status.set("本地模型服务已就绪")
+                    elif self._first_run_hint():
+                        self.status.set("本地模型服务未就绪：请到「设置 → 云端模型」配置 API Key"
+                                        "（推荐阿里通义千问，有免费额度）")
+                    elif self.cfg.mode() == "cloud_first":
+                        self.status.set("云端优先模式：本地模型服务未就绪（不影响识别，识别走云端）")
+                    else:
+                        self.status.set("本地模型服务未就绪（可在设置里检查）")
+                    self._refresh_first_run_hint()
                 elif kind == "recognized":
                     self._on_recognized(msg[1])
                 elif kind == "image_started":
@@ -1701,6 +1739,7 @@ class MainWindow(tk.Tk):
             self.analyzer = Analyzer(self.cfg, on_log=self._log_threadsafe)
             self.archiver = Archiver(self.cfg, self.store)
             self._refresh_mode_labels()
+            self._refresh_first_run_hint()          # 配好云端后，首页引导自动消失
             self.animations_enabled = bool(self.cfg.get("ui.animations", True))
             self.log("设置已更新")
 
