@@ -626,17 +626,25 @@ def page_meta(page: dict) -> dict:
 
 
 def questions_truth(page: dict) -> list:
-    """逐题标准答案：识别得对不对、错因判得准不准，都靠它对答案。"""
+    """逐题标准答案：识别得对不对、错因判得准不准，都靠它对答案。
+
+    ``student_answer`` 的取值：选择题是选的那个字母、填空题是写在横线上的答案，
+    解答/计算题则取**手写过程的最后一行**（那通常就是学生给出的结论）。
+    """
     out = []
     for q in page["questions"]:
+        steps = [ln["t"] if isinstance(ln, dict) else ln for ln in (q.get("work") or [])]
+        answer = q.get("pick") or q.get("answer_line") or ""
+        if not answer and steps:
+            answer = steps[-1]
         out.append({
             "no": q["no"],
             "type": q["type"],
             "score": q.get("score", 0),
             "stem": q["stem"],
             "options": q.get("options") or [],
-            "student_answer": q.get("pick") or q.get("answer_line") or "",
-            "student_steps": [ln["t"] if isinstance(ln, dict) else ln for ln in (q.get("work") or [])],
+            "student_answer": answer,
+            "student_steps": steps,
             "status": q["status"],
             "correct_answer": q["correct_answer"],
             "error_type": q["error_type"],
