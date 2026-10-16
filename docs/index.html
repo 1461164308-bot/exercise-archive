@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 错题本 · 拍照即归档的错题整理工具</title>
+<meta name="description" content="把手机拍的错题照片，自动变成可复习、可打印、能按知识点查找的错题本。纯 Python 标准库实现，离线可用。">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#171a2b; --muted:#5d6484;
+    --line:#e6e8f2; --brand:#5b5bd6; --brand-soft:#eeeefc;
+    --ok:#12805c; --warn-bg:#fff8e6; --warn-line:#f0d38a; --warn-ink:#7a5300;
+    --radius:16px; --shadow:0 1px 2px rgba(23,26,43,.05),0 8px 24px rgba(23,26,43,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+  a{color:var(--brand); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 20px}
+  section{padding:56px 0; border-top:1px solid var(--line)}
+  h1{font-size:clamp(30px,5vw,46px); line-height:1.2; margin:0 0 14px; letter-spacing:-.5px}
+  h2{font-size:clamp(21px,3vw,27px); margin:0 0 10px; letter-spacing:-.3px}
+  h3{font-size:17px; margin:0 0 6px}
+  p{margin:0 0 12px}
+  .lead{color:var(--muted); font-size:clamp(16px,2.2vw,19px); max-width:62ch}
+  .sub{color:var(--muted); font-size:14.5px}
+
+  /* hero */
+  .hero{padding:64px 0 48px; text-align:center}
+  .hero .badge{
+    display:inline-flex; gap:8px; align-items:center; background:var(--brand-soft); color:var(--brand);
+    font-size:13px; font-weight:600; padding:6px 14px; border-radius:999px; margin-bottom:22px;
+  }
+  .hero .lead{margin:0 auto 26px}
+  .cta{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:38px}
+  .btn{
+    display:inline-block; padding:12px 24px; border-radius:12px; font-weight:600; font-size:15px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink); box-shadow:var(--shadow);
+  }
+  .btn:hover{text-decoration:none; transform:translateY(-1px)}
+  .btn.primary{background:var(--brand); border-color:var(--brand); color:#fff;
+    box-shadow:0 6px 18px rgba(91,91,214,.28)}
+  .btn small{display:block; font-weight:400; font-size:12px; opacity:.72; margin-top:2px}
+
+  figure{margin:0}
+  .shot{
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+    background:var(--card); box-shadow:var(--shadow);
+  }
+  .shot img{display:block; width:100%; height:auto}
+  figcaption{color:var(--muted); font-size:14px; margin-top:12px; text-align:center}
+
+  /* cards / grid */
+  .grid{display:grid; gap:18px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; box-shadow:var(--shadow)}
+  .card .n{display:inline-flex; width:28px; height:28px; border-radius:9px; background:var(--brand-soft);
+    color:var(--brand); font-weight:700; font-size:14px; align-items:center; justify-content:center; margin-bottom:12px}
+  .card p{margin:0; color:var(--muted); font-size:14.5px}
+
+  ul.feat{list-style:none; padding:0; margin:0}
+  ul.feat li{padding-left:24px; position:relative; margin-bottom:9px; color:var(--muted)}
+  ul.feat li::before{content:"✓"; position:absolute; left:0; color:var(--ok); font-weight:700}
+  ul.feat li b{color:var(--ink)}
+
+  ol.steps{padding-left:0; list-style:none; counter-reset:s}
+  ol.steps li{counter-increment:s; position:relative; padding-left:44px; margin-bottom:18px}
+  ol.steps li::before{
+    content:counter(s); position:absolute; left:0; top:2px; width:28px; height:28px; border-radius:50%;
+    background:var(--brand); color:#fff; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center;
+  }
+  code{background:#eceef7; padding:2px 7px; border-radius:6px; font-size:13.5px;
+    font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+  .note{background:var(--warn-bg); border:1px solid var(--warn-line); color:var(--warn-ink);
+    border-radius:var(--radius); padding:18px 20px; margin-top:22px}
+  .note b{color:#5c3d00}
+  .docs-list{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); margin-top:8px}
+  .docs-list a{display:block; padding:13px 16px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; font-size:14.5px}
+  .docs-list a:hover{border-color:var(--brand); text-decoration:none}
+  footer{padding:40px 0 56px; text-align:center; color:var(--muted); font-size:14px; border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<header class="hero wrap">
+  <div class="badge">v1.2.0 · MIT License</div>
+  <h1>AI 错题本</h1>
+  <p class="lead">把手机拍的错题照片，自动变成可复习、可打印、能按知识点查找的错题本。<br>
+     识别题干与手写作答 → 判定对错 → 自动分类归档 → 逐题生成错题分析 → 一键导出 Word / PDF。</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/1461164308-bot/exercise-archive/releases/latest">下载便携版<small>Windows 10/11 · 解压即用</small></a>
+    <a class="btn" href="https://github.com/1461164308-bot/exercise-archive">查看源码<small>GitHub 仓库</small></a>
+  </div>
+  <figure>
+    <div class="shot"><img src="demo/01-home.png" alt="AI 错题本主界面"></div>
+    <figcaption>主界面 · 导入 → 识别 → 整理，三步收好每一道题</figcaption>
+  </figure>
+</header>
+
+<section class="wrap">
+  <h2>它解决什么问题</h2>
+  <p class="lead">错题本最麻烦的从来不是整理，而是「抄」——抄题干、抄自己的错答、抄解析。这个工具把这一步交给模型，你只负责拍照。</p>
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><div class="n">1</div><h3>拍照导入</h3>
+      <p>支持 JPG / PNG，可一次选多张。自动做倾斜纠偏、提亮、对比度拉伸，模糊和拍歪的照片也能识别。</p></div>
+    <div class="card"><div class="n">2</div><h3>识别与判对错</h3>
+      <p>读题干、读你的手写作答，判定「正确 / 错题 / 未做」，并自动归类学科、题型、知识点与年级。</p></div>
+    <div class="card"><div class="n">3</div><h3>归档与复盘</h3>
+      <p>按学科和知识点自动落到归档目录；逐题生成错因分析；统计薄弱点；一键导出 Word / PDF 打印。</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>看一眼界面</h2>
+  <p class="lead">下面全部是真实运行截图（示例数据），不是设计稿。</p>
+  <div class="grid g2" style="margin-top:26px">
+    <figure>
+      <div class="shot"><img src="demo/02-library.png" alt="我的题库"></div>
+      <figcaption>我的题库 · 按状态 / 学科 / 知识点筛选，右侧直接核对题干与作答</figcaption>
+    </figure>
+    <figure>
+      <div class="shot"><img src="demo/03-overview.png" alt="学习概览"></div>
+      <figcaption>学习概览 · 题目总数、错题数、薄弱知识点、错误原因分布</figcaption>
+    </figure>
+    <figure>
+      <div class="shot"><img src="demo/04-analysis.png" alt="错题分析"></div>
+      <figcaption>错题分析 · 题目还原 + 错误原因分析，公式按教科书方式排版</figcaption>
+    </figure>
+    <figure>
+      <div class="shot"><img src="demo/07-preprocess.png" alt="图片预处理"></div>
+      <figcaption>图片优化 · 纠偏、提亮、锐化，以及质量评分</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>技术上的几个取舍</h2>
+  <div class="grid g2" style="margin-top:8px">
+    <div class="card">
+      <h3>纯 Python 标准库，零第三方依赖</h3>
+      <ul class="feat">
+        <li>GUI 用 <b>tkinter</b>，图像走 <b>GDI+</b>，数据库用 <b>sqlite3</b>，加密用自实现的 ChaCha20/HMAC</li>
+        <li>Word 导出是<b>手写 OOXML</b>，不需要装 Office</li>
+        <li>公式排版<b>自己实现</b>（分式、根号、上下标、矩阵），不依赖 MathJax</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>模型可以本地，也可以云端</h3>
+      <ul class="feat">
+        <li><b>本地</b>：接 Ollama 的视觉模型，完全离线，数据不出机器</li>
+        <li><b>云端</b>：任何 OpenAI 兼容接口（通义千问 / DeepSeek / GLM / 自建网关）</li>
+        <li>两种模式都支持，可设「本地优先 + 云端兜底」，一个失败自动切另一个</li>
+        <li>题库内容<b>本地加密存储</b>，密钥不出本机</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>快速开始</h2>
+  <ol class="steps" style="margin-top:22px">
+    <li><b>下载</b>：到 <a href="https://github.com/1461164308-bot/exercise-archive/releases/latest">Releases</a> 下载
+      <code>exercise-archive-portable-v1.2.0.zip</code>（约 19 MB，带 portable 的那个）。
+      <span class="sub">另一个 source 包是纯源码，需要目标电脑已装 Python。</span></li>
+    <li><b>解压</b>：解压到<b>不含中文和空格的路径</b>，例如 <code>D:\AI错题本</code>。
+      <span class="sub">不要放 <code>C:\Program Files</code> 下——那里没有写权限，题库会存不下来。</span></li>
+    <li><b>启动</b>：双击 <code>启动.bat</code>。窗口出现即成功，此时先别急着识别。</li>
+    <li><b>配好模型</b>：右上角「设置」→「云端模型」，填 Base URL / 模型名 / API Key，
+      <b>并勾选「该模型支持图片」</b>，测试连接后保存。
+      <span class="sub">不勾「支持图片」是最常见的坑——云端收不到图片，会识别出 0 道题。</span></li>
+  </ol>
+  <div class="note">
+    <b>⚠️ 便携包自带 Python 运行时，但不含 AI 模型。</b><br>
+    模型动辄几 GB，该用哪个取决于你的电脑和预算，所以必须由你选一条：<br>
+    ① <b>云端模型（推荐，约 5 分钟）</b>——申请一个 API Key，阿里通义千问有免费额度，没有独立显卡也能用；<br>
+    ② <b>本地模型</b>——装 <a href="https://ollama.com">Ollama</a> 并 <code>ollama pull qwen3-vl:4b</code>（约 3 GB，需 4~6 GB 显存），完全离线。<br>
+    没配好模型时，软件首页会给出醒目提示并一键跳到设置窗口。
+  </div>
+  <figure style="margin-top:26px">
+    <div class="shot"><img src="demo/05-first-run.png" alt="首次使用引导"></div>
+    <figcaption>没配模型时的首次使用引导</figcaption>
+  </figure>
+</section>
+
+<section class="wrap">
+  <h2>文档</h2>
+  <p class="sub">完整文档在仓库 <code>docs/</code> 目录下。</p>
+  <div class="docs-list">
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/docs/07-用户全流程使用说明.md">07 · 用户全流程使用说明（推荐先读）</a>
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/docs/01-安装部署教程.md">01 · 安装部署教程</a>
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/docs/02-使用说明书.md">02 · 使用说明书</a>
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/docs/05-模型与云端接口配置教程.md">05 · 模型与云端接口配置教程</a>
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/docs/03-常见问题排查.md">03 · 常见问题排查</a>
+    <a href="https://github.com/1461164308-bot/exercise-archive/blob/main/README.md">README · 项目总览</a>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>AI 错题本 · MIT License · <a href="https://github.com/1461164308-bot/exercise-archive">github.com/1461164308-bot/exercise-archive</a></p>
+  <p class="sub">随包附带的 Python 运行时版权归 Python Software Foundation。</p>
+</footer>
+
+</body>
+</html>
